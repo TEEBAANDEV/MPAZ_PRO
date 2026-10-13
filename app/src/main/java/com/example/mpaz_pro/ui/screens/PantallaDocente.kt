@@ -29,22 +29,34 @@ fun PantallaDocente(
     val objetivos by viewModel.todosLosObjetivos.collectAsState()
     val informes by viewModel.informes.collectAsState()
     var pestañaSeleccionada by remember { mutableStateOf(0) }
-    val titulosPestañas = listOf("Objetivos 2° Básico", "Monitoreo", "Informes")
+    val titulosPestañas = listOf("Panel Principal", "Módulos de Aprendizaje", "Seguimiento e Informes")
 
     var informeParaEditar by remember { mutableStateOf<InformeEntity?>(null) }
 
+    val pantallaActual = when (pestañaSeleccionada) {
+        0 -> "Panel Principal"
+        1 -> "Módulos de Aprendizaje"
+        else -> "Seguimiento e Informes"
+    }
+
     AppDrawer(
-        pantallaActual = "Panel Principal",
+        pantallaActual = pantallaActual,
         nombreUsuario = "Prof. Mario Silva",
         rolUsuario = "Docente 2° Básico",
-        onPantallaSeleccionada = { pestañaSeleccionada = 0 },
+        onPantallaSeleccionada = { seccion ->
+            when (seccion) {
+                "Panel Principal" -> pestañaSeleccionada = 0
+                "Módulos de Aprendizaje" -> pestañaSeleccionada = 1
+                "Seguimiento e Informes" -> pestañaSeleccionada = 2
+            }
+        },
         onCerrarSesion = alCerrarSesion
     ) { abrirMenu ->
         Scaffold(
             topBar = {
                 BarraSuperiorMpaz(
                     titulo = "Docente 2° Básico",
-                    subtitulo = "Prof. Mario Silva - Marcela Paz",
+                    subtitulo = "$pantallaActual • Prof. Mario Silva",
                     alAbrirMenu = { abrirMenu() },
                     alCerrarSesion = alCerrarSesion
                 )
@@ -52,14 +64,14 @@ fun PantallaDocente(
             bottomBar = {
                 AppBottomBar(
                     elementoSeleccionado = when (pestañaSeleccionada) {
-                        0 -> "modulos"
-                        1 -> "inicio"
+                        0 -> "inicio"
+                        1 -> "modulos"
                         else -> "informes"
                     },
                     alSeleccionarElemento = { id ->
                         when (id) {
-                            "modulos" -> pestañaSeleccionada = 0
-                            "inicio" -> pestañaSeleccionada = 1
+                            "inicio" -> pestañaSeleccionada = 0
+                            "modulos" -> pestañaSeleccionada = 1
                             "informes" -> pestañaSeleccionada = 2
                             "perfil" -> alCerrarSesion()
                         }
@@ -84,11 +96,58 @@ fun PantallaDocente(
 
                 when (pestañaSeleccionada) {
                     0 -> {
-                        // 1. Pestaña Objetivos con Switch para Habilitar al Curso
+                        // 1. Panel Principal: Monitoreo en Tiempo Real del Curso
                         LazyColumn(
                             modifier = Modifier.fillMaxSize().padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
+                            item {
+                                Text(
+                                    text = "Monitoreo de Aprendizaje en Vivo (${informes.size} Alumnos)",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            items(informes, key = { it.id }) { inf ->
+                                Card(
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.padding(16.dp)) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(inf.nombreEstudiante, fontWeight = FontWeight.Bold)
+                                            Text("${inf.porcentajeLogro}% Logro", fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
+                                        }
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text("${inf.curso} • ${inf.asignatura}", style = MaterialTheme.typography.bodySmall)
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        LinearProgressIndicator(
+                                            progress = { inf.porcentajeLogro / 100f },
+                                            modifier = Modifier.fillMaxWidth().height(8.dp),
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    1 -> {
+                        // 2. Módulos de Aprendizaje: Objetivos con Switch para Habilitar al Curso
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            item {
+                                Text(
+                                    text = "Gestión de Módulos y Objetivos Activos",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                             items(objetivos, key = { it.id }) { obj ->
                                 Card(
                                     shape = RoundedCornerShape(12.dp),
@@ -111,39 +170,6 @@ fun PantallaDocente(
                                         Switch(
                                             checked = obj.asignadoAlCurso,
                                             onCheckedChange = { viewModel.alternarAsignacionObjetivo(obj.id, it) }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    1 -> {
-                        // 2. Pestaña Monitoreo en Tiempo Real
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize().padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(informes, key = { it.id }) { inf ->
-                                Card(
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Column(modifier = Modifier.padding(16.dp)) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            Text(inf.nombreEstudiante, fontWeight = FontWeight.Bold)
-                                            Text("${inf.porcentajeLogro}% Logro", fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
-                                        }
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text("${inf.curso} • ${inf.asignatura}", style = MaterialTheme.typography.bodySmall)
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        LinearProgressIndicator(
-                                            progress = { inf.porcentajeLogro / 100f },
-                                            modifier = Modifier.fillMaxWidth().height(8.dp),
-                                            color = MaterialTheme.colorScheme.primary
                                         )
                                     }
                                 }

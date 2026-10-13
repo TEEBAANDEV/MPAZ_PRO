@@ -33,6 +33,7 @@ fun PantallaEstudiante(
     val estaHablando by viewModel.estaHablando.collectAsState()
     val nombreAlumno = usuarioActual?.nombreCompleto ?: "Lucas"
 
+    var seccionActual by remember { mutableStateOf("Panel Principal") }
     var indiceObjetivoActual by remember { mutableStateOf(0) }
     var respuestaSeleccionada by remember { mutableStateOf<Int?>(null) }
     var mensajeResultado by remember { mutableStateOf<String?>(null) }
@@ -40,30 +41,121 @@ fun PantallaEstudiante(
     val objetivoActivo = objetivos.getOrNull(indiceObjetivoActual)
 
     AppDrawer(
-        pantallaActual = "Panel Principal",
+        pantallaActual = seccionActual,
         nombreUsuario = nombreAlumno,
         rolUsuario = "Estudiante 2° Básico",
-        onPantallaSeleccionada = { indiceObjetivoActual = 0 },
-        onCerrarSesion = alCerrarSesion
+        onPantallaSeleccionada = { seccion ->
+            seccionActual = seccion
+            if (seccion == "Seguimiento e Informes") {
+                viewModel.detenerAudio()
+            }
+        },
+        onCerrarSesion = {
+            viewModel.detenerAudio()
+            alCerrarSesion()
+        }
     ) { abrirMenu ->
         Scaffold(
             topBar = {
                 BarraSuperiorMpaz(
                     titulo = "¡Hola, $nombreAlumno! ⭐",
-                    subtitulo = "2° Básico • Escuela Marcela Paz",
+                    subtitulo = "$seccionActual • 2° Básico",
                     alAbrirMenu = { abrirMenu() },
-                    alCerrarSesion = alCerrarSesion
+                    alCerrarSesion = {
+                        viewModel.detenerAudio()
+                        alCerrarSesion()
+                    }
                 )
             }
         ) { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            if (seccionActual == "Seguimiento e Informes") {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(56.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Mi Progreso y Medallas",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "¡Excelente dedicación en tus lecturas, $nombreAlumno!",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = "Resumen de Aprendizaje",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Misiones Asignadas:")
+                                Text("${objetivos.size}", fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Apoyo de Audio (TTS):")
+                                Text("Activo 🔊", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Vibración Háptica:")
+                                Text("Activa 📳", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    }
+
+                    Button(
+                        onClick = { seccionActual = "Panel Principal" },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Volver a Mis Misiones de Aprendizaje")
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                 // Selector de Misión / Asignatura
                 Text(
                     text = "Elige tu Misión de Aprendizaje:",
@@ -210,3 +302,5 @@ fun PantallaEstudiante(
         }
     }
 }
+}
+
