@@ -20,8 +20,7 @@ La solución centraliza contenidos didácticos, actividades interactivas progres
 
 ## 👥 2. Integrantes del Equipo
 
-* **Estudiante 1:** [Nombre y Apellidos] - [RUT / Sección]
-* **Estudiante 2:** [Nombre y Apellidos] - [RUT / Sección]
+Damian Caceres - 20.712.243-1 / Seccion 007D
 
 ---
 
