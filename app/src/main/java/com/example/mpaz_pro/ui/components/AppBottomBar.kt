@@ -12,10 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 
-/**
- * Elemento de navegación inferior para la barra NavigationBar,
- * basado en el ejemplo MiApp2.0 (HomeScreen.kt).
- */
 data class ElementoNavegacionInferior(
     val id: String,
     val etiqueta: String,

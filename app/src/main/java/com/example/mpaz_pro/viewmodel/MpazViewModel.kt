@@ -16,17 +16,12 @@ import com.example.mpaz_pro.native.AyudanteVibracion
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel principal y simplificado para la lógica pedagógica de MPAZ PRO.
- * Conecta UTP, Docente y Estudiante con la base de datos Room y recursos nativos.
- */
 class MpazViewModel(
     private val repositorio: RepositorioApp,
     private val ayudanteTextoAVoz: AyudanteTextoAVoz,
     private val ayudanteVibracion: AyudanteVibracion
 ) : ViewModel() {
 
-    // --- Flujos de datos Room ---
     val todosLosObjetivos: StateFlow<List<ObjetivoEntity>> = repositorio.obtenerTodosLosObjetivos()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -38,7 +33,6 @@ class MpazViewModel(
 
     val estaHablando: StateFlow<Boolean> = ayudanteTextoAVoz.estaHablando
 
-    // --- 1. RECURSOS NATIVOS: Text-To-Speech y Vibración ---
     fun reproducirAudio(texto: String) {
         ayudanteTextoAVoz.hablar(texto)
     }
@@ -55,7 +49,6 @@ class MpazViewModel(
         ayudanteVibracion.reproducirError()
     }
 
-    // --- 2. PERFIL UTP: Gestión de Objetivos Curriculares ---
     private val _formularioObjetivo = MutableStateFlow(FormularioObjetivoModel())
     val formularioObjetivo: StateFlow<FormularioObjetivoModel> = _formularioObjetivo.asStateFlow()
 
@@ -128,7 +121,6 @@ class MpazViewModel(
         }
     }
 
-    // --- 3. PERFIL DOCENTE: Asignación y Observación Pedagógica ---
     private val _formularioObs = MutableStateFlow(FormularioObservacionModel())
     val formularioObs: StateFlow<FormularioObservacionModel> = _formularioObs.asStateFlow()
 
@@ -167,7 +159,6 @@ class MpazViewModel(
         AyudanteCompartirInforme.compartirInforme(contexto, informe)
     }
 
-    // --- 4. PERFIL ESTUDIANTE: Respuesta Interactiva y Progreso ---
     fun responderPregunta(
         indiceSeleccionado: Int,
         objetivo: ObjetivoEntity,

@@ -3,14 +3,10 @@ package com.example.mpaz_pro.data.local
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/**
- * Carga los datos semilla iniciales de la Escuela Escritora Marcela Paz (San Bernardo)
- * para los 3 perfiles (UTP, Docente, Estudiante) y las 4 asignaturas de 2° Básico.
- */
 object InicializadorBaseDatos {
 
     suspend fun inicializar(dao: AppDao) = withContext(Dispatchers.IO) {
-        // 1. Usuarios del sistema
+
         val usuarios = listOf(
             UsuarioEntity("utp", "1234", "Jefatura UTP - Marcela Paz", "UTP"),
             UsuarioEntity("docente", "1234", "Prof. Mario Silva", "DOCENTE"),
@@ -18,7 +14,6 @@ object InicializadorBaseDatos {
         )
         dao.insertarUsuarios(usuarios)
 
-        // 2. Objetivos de Aprendizaje de las 4 Asignaturas oficiales
         val objetivos = listOf(
             ObjetivoEntity(
                 id = "obj_lenguaje_01",
@@ -75,7 +70,6 @@ object InicializadorBaseDatos {
         )
         dao.insertarObjetivos(objetivos)
 
-        // 3. Informes pedagógicos iniciales
         val informes = listOf(
             InformeEntity(
                 id = "inf_01",

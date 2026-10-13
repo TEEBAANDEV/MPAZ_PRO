@@ -1,22 +1,31 @@
 package com.example.mpaz_pro.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.mpaz_pro.ui.components.AppBottomBar
 import com.example.mpaz_pro.ui.components.AppDrawer
 import com.example.mpaz_pro.ui.components.BarraSuperiorMpaz
+import com.example.mpaz_pro.ui.components.ElementoNavegacionInferior
 import com.example.mpaz_pro.viewmodel.MpazViewModel
 
 @Composable
@@ -28,6 +37,7 @@ fun PantallaUtp(
     val objetivos by viewModel.todosLosObjetivos.collectAsState()
     var seccionActual by remember { mutableStateOf("Panel Principal") }
     var pestañaAsignatura by remember { mutableStateOf("todas") }
+    var filtroEstado by remember { mutableStateOf("todos") }
     var mostrarDialogoNuevo by remember { mutableStateOf(false) }
 
     val asignaturas = listOf(
@@ -38,13 +48,38 @@ fun PantallaUtp(
         "historia" to "Historia"
     )
 
-    val objetivosFiltrados = remember(objetivos, pestañaAsignatura) {
+    val objetivosPorAsignatura = remember(objetivos, pestañaAsignatura) {
         if (pestañaAsignatura == "todas") objetivos
         else objetivos.filter { it.idAsignatura == pestañaAsignatura }
     }
 
+    val objetivosFiltrados = remember(objetivosPorAsignatura, filtroEstado) {
+        when (filtroEstado) {
+            "autorizados" -> objetivosPorAsignatura.filter { it.estado == "AUTORIZADO" }
+            "pendientes" -> objetivosPorAsignatura.filter { it.estado != "AUTORIZADO" }
+            else -> objetivosPorAsignatura
+        }
+    }
+
+    val total = objetivos.size
+    val autorizados = objetivos.count { it.estado == "AUTORIZADO" }
+    val cobertura = if (total > 0) (autorizados * 100) / total else 0
+
+    val elementosUtp = listOf(
+        ElementoNavegacionInferior("objetivos", "Objetivos", Icons.Default.Book),
+        ElementoNavegacionInferior("modulos", "Módulos", Icons.Default.School),
+        ElementoNavegacionInferior("auditoria", "Auditoría", Icons.Default.Assessment),
+        ElementoNavegacionInferior("perfil", "Perfil UTP", Icons.Default.Person)
+    )
+
     AppDrawer(
-        pantallaActual = seccionActual,
+        pantallaActual = when (seccionActual) {
+            "Panel Principal" -> "Panel Principal"
+            "Módulos de Aprendizaje" -> "Módulos de Aprendizaje"
+            "Seguimiento e Informes" -> "Seguimiento e Informes"
+            "Perfil UTP" -> "Perfil UTP"
+            else -> "Panel Principal"
+        },
         nombreUsuario = "Jefatura UTP",
         rolUsuario = "Administración Curricular",
         onPantallaSeleccionada = { seccion ->
@@ -62,6 +97,25 @@ fun PantallaUtp(
                     subtitulo = "$seccionActual • 2° Básico",
                     alAbrirMenu = { abrirMenu() },
                     alCerrarSesion = alCerrarSesion
+                )
+            },
+            bottomBar = {
+                AppBottomBar(
+                    elementoSeleccionado = when (seccionActual) {
+                        "Panel Principal" -> "objetivos"
+                        "Módulos de Aprendizaje" -> "modulos"
+                        "Seguimiento e Informes" -> "auditoria"
+                        else -> "perfil"
+                    },
+                    elementos = elementosUtp,
+                    alSeleccionarElemento = { id ->
+                        when (id) {
+                            "objetivos" -> seccionActual = "Panel Principal"
+                            "modulos" -> seccionActual = "Módulos de Aprendizaje"
+                            "auditoria" -> seccionActual = "Seguimiento e Informes"
+                            "perfil" -> seccionActual = "Perfil UTP"
+                        }
+                    }
                 )
             },
             floatingActionButton = {
@@ -85,7 +139,7 @@ fun PantallaUtp(
                             .fillMaxSize()
                             .padding(padding)
                     ) {
-                        // Selector de Asignaturas
+
                         ScrollableTabRow(
                             selectedTabIndex = asignaturas.indexOfFirst { it.first == pestañaAsignatura }.coerceAtLeast(0),
                             edgePadding = 16.dp
@@ -97,6 +151,29 @@ fun PantallaUtp(
                                     text = { Text(nombre, fontWeight = FontWeight.SemiBold) }
                                 )
                             }
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            FilterChip(
+                                selected = filtroEstado == "todos",
+                                onClick = { filtroEstado = "todos" },
+                                label = { Text("Todos (${objetivosPorAsignatura.size})") }
+                            )
+                            FilterChip(
+                                selected = filtroEstado == "autorizados",
+                                onClick = { filtroEstado = "autorizados" },
+                                label = { Text("Autorizados (${objetivosPorAsignatura.count { it.estado == "AUTORIZADO" }})") }
+                            )
+                            FilterChip(
+                                selected = filtroEstado == "pendientes",
+                                onClick = { filtroEstado = "pendientes" },
+                                label = { Text("Pendientes (${objetivosPorAsignatura.count { it.estado != "AUTORIZADO" }})") }
+                            )
                         }
 
                         LazyColumn(
@@ -150,7 +227,10 @@ fun PantallaUtp(
                                         if (obj.estado != "AUTORIZADO") {
                                             Spacer(modifier = Modifier.height(8.dp))
                                             Button(
-                                                onClick = { viewModel.autorizarObjetivo(obj.id) },
+                                                onClick = {
+                                                    viewModel.autorizarObjetivo(obj.id)
+                                                    viewModel.vibrarAcierto()
+                                                },
                                                 modifier = Modifier.align(Alignment.End)
                                             ) {
                                                 Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -244,10 +324,6 @@ fun PantallaUtp(
                 }
 
                 "Seguimiento e Informes" -> {
-                    val total = objetivos.size
-                    val autorizados = objetivos.count { it.estado == "AUTORIZADO" }
-                    val cobertura = if (total > 0) (autorizados * 100) / total else 0
-
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -362,11 +438,121 @@ fun PantallaUtp(
                         }
                     }
                 }
+
+                "Perfil UTP" -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primaryContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.School,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
+
+                        Text(
+                            text = "Jefatura Técnico-Pedagógica",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Escuela Marcela Paz • San Bernardo",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Text(text = "Ficha de Coordinación UTP", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                                HorizontalDivider()
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Establecimiento:", color = MaterialTheme.colorScheme.outline)
+                                    Text("Escuela Marcela Paz", fontWeight = FontWeight.Medium)
+                                }
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Nivel Curricular:", color = MaterialTheme.colorScheme.outline)
+                                    Text("2° Básico (Decreto 67)", fontWeight = FontWeight.Medium)
+                                }
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Objetivos Autorizados:", color = MaterialTheme.colorScheme.outline)
+                                    Text("$autorizados de $total", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                }
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Cobertura Curricular:", color = MaterialTheme.colorScheme.outline)
+                                    Text("$cobertura%", fontWeight = FontWeight.Bold)
+                                }
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("Ciclo Lectivo:", color = MaterialTheme.colorScheme.outline)
+                                    Text("Primer Semestre 2026", fontWeight = FontWeight.Medium)
+                                }
+                            }
+                        }
+
+                        Button(
+                            onClick = {
+                                val resumen = """
+                                    ==========================================
+                                    ESCUELA MARCELA PAZ - REPORTE UTP 2° BÁSICO
+                                    ==========================================
+                                    Total Objetivos Registrados: $total
+                                    Objetivos Autorizados: $autorizados
+                                    Cobertura Curricular: $cobertura%
+                                    Fecha: ${java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(java.util.Date())}
+                                    ==========================================
+                                """.trimIndent()
+
+                                val intent = android.content.Intent().apply {
+                                    action = android.content.Intent.ACTION_SEND
+                                    putExtra(android.content.Intent.EXTRA_TEXT, resumen)
+                                    putExtra(android.content.Intent.EXTRA_SUBJECT, "Reporte Curricular UTP 2° Básico")
+                                    type = "text/plain"
+                                }
+                                val chooser = android.content.Intent.createChooser(intent, "Compartir Reporte UTP")
+                                chooser.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                contexto.startActivity(chooser)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Compartir Reporte de Auditoría")
+                        }
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        OutlinedButton(
+                            onClick = alCerrarSesion,
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Cerrar Sesión UTP")
+                        }
+                    }
+                }
             }
         }
     }
 
-    // Diálogo con Formulario de Creación de Objetivo (Patrón MiAppFormulario)
     if (mostrarDialogoNuevo) {
         val form by viewModel.formularioObjetivo.collectAsState()
         val errores by viewModel.erroresObjetivo.collectAsState()

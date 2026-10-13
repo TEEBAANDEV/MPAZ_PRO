@@ -92,7 +92,7 @@ fun PantallaDocente(
             ) {
                 when (pestañaSeleccionada) {
                     0 -> {
-                        // 1. Inicio / Panel Principal: Monitoreo en Tiempo Real del Curso
+
                         LazyColumn(
                             modifier = Modifier.fillMaxSize().padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -142,7 +142,7 @@ fun PantallaDocente(
                         }
                     }
                     1 -> {
-                        // 2. Módulos de Aprendizaje: Objetivos con Switch para Habilitar al Curso
+
                         LazyColumn(
                             modifier = Modifier.fillMaxSize().padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -190,7 +190,7 @@ fun PantallaDocente(
                         }
                     }
                     2 -> {
-                        // 3. Informes: Seguimiento Pedagógico, Observaciones y Compartir Nativo
+
                         LazyColumn(
                             modifier = Modifier.fillMaxSize().padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -254,7 +254,7 @@ fun PantallaDocente(
                         }
                     }
                     3 -> {
-                        // 4. Perfil Institucional del Docente
+
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -334,7 +334,6 @@ fun PantallaDocente(
         }
     }
 
-    // Diálogo para Editar Observación Docente
     if (informeParaEditar != null) {
         val formObs by viewModel.formularioObs.collectAsState()
         val erroresObs by viewModel.erroresObs.collectAsState()

@@ -20,11 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 
-/**
- * Barra superior basada en los ejemplos de clase:
- * - MenuDeslizanteCompose (AppTopBar con apertura de menú deslizante)
- * - AppMenu2.0 / MiApp2.0 (TopAppBar con NuevoMenu desplegable)
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(

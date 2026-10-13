@@ -5,10 +5,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
-/**
- * Menú desplegable contextual para la barra superior,
- * basado en el ejemplo del docente (AppMenu y MiApp2.0 / Componentes.kt).
- */
 @Composable
 fun NuevoMenu(
     isExpanded: Boolean,
@@ -18,7 +14,7 @@ fun NuevoMenu(
     val opciones = listOf(
         "Escuela Marcela Paz",
         "Reglamento de Evaluación",
-        "Modo Alto Contraste",
+        "Tema y Alto Contraste",
         "Cerrar Sesión"
     )
 

@@ -18,10 +18,6 @@ data class EstadoAutenticacion(
     val usuarioActual: UsuarioEntity? = null
 )
 
-/**
- * ViewModel de autenticación con el patrón de MiAppFormulario
- * (FormularioLoginModel y FormularioLoginErrores).
- */
 class AutenticacionViewModel(private val repositorio: RepositorioApp) : ViewModel() {
 
     private val _formulario = MutableStateFlow(FormularioLoginModel())

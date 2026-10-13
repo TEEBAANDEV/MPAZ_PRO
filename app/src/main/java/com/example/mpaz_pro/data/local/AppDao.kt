@@ -6,20 +6,15 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
-/**
- * DAO unificado y directo para todas las operaciones de persistencia Room.
- */
 @Dao
 interface AppDao {
 
-    // --- Usuarios y Autenticación ---
     @Query("SELECT * FROM usuarios WHERE nombreUsuario = :usuario AND clave = :clave LIMIT 1")
     suspend fun iniciarSesion(usuario: String, clave: String): UsuarioEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertarUsuarios(usuarios: List<UsuarioEntity>)
 
-    // --- Objetivos Curriculares ---
     @Query("SELECT * FROM objetivos")
     fun obtenerTodosLosObjetivos(): Flow<List<ObjetivoEntity>>
 
@@ -38,7 +33,6 @@ interface AppDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertarObjetivos(objetivos: List<ObjetivoEntity>)
 
-    // --- Informes Pedagógicos y Seguimiento ---
     @Query("SELECT * FROM informes")
     fun obtenerTodosLosInformes(): Flow<List<InformeEntity>>
 

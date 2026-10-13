@@ -33,10 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-/**
- * Menú deslizante lateral (Drawer) implementado con ModalNavigationDrawer,
- * basado estrictamente en el proyecto de clase (MenuDeslizanteCompose).
- */
 @Composable
 fun AppDrawer(
     pantallaActual: String,
@@ -53,7 +49,7 @@ fun AppDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                // Encabezado del Menú Lateral con identidad del establecimiento
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -99,7 +95,6 @@ fun AppDrawer(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Opciones del Menú Deslizante
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = null) },
                     label = { Text("Panel Principal") },

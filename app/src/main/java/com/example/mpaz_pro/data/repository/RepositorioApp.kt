@@ -6,9 +6,6 @@ import com.example.mpaz_pro.data.local.ObjetivoEntity
 import com.example.mpaz_pro.data.local.UsuarioEntity
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Repositorio centralizado que conecta los ViewModels con el DAO de Room.
- */
 class RepositorioApp(private val dao: AppDao) {
 
     suspend fun iniciarSesion(usuario: String, clave: String): UsuarioEntity? {

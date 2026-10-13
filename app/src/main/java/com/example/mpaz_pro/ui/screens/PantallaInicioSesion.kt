@@ -46,7 +46,7 @@ fun PantallaInicioSesion(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Icono / Logo de la Escuela
+
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary,
@@ -75,7 +75,6 @@ fun PantallaInicioSesion(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            // Tarjeta de Formulario (Patrón MiAppFormulario)
             Card(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),

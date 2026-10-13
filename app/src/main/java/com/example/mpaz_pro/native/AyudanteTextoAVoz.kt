@@ -26,8 +26,8 @@ class AyudanteTextoAVoz(contexto: Context) : TextToSpeech.OnInitListener {
             if (resultado == TextToSpeech.LANG_MISSING_DATA || resultado == TextToSpeech.LANG_NOT_SUPPORTED) {
                 tts?.setLanguage(Locale("es", "ES"))
             }
-            tts?.setPitch(1.05f) // Tono ligeramente más amigable para niños
-            tts?.setSpeechRate(0.88f) // Ritmo más pausado y claro para 2° básico
+            tts?.setPitch(1.05f)
+            tts?.setSpeechRate(0.88f)
             estaInicializado = true
         } else {
             Log.e("AyudanteTextoAVoz", "Error al inicializar TextToSpeech nativo")
