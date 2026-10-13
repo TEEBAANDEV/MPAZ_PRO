@@ -12,51 +12,51 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.rememberNavController
-import com.example.mpaz_pro.ui.navigation.AppNavHost
+import com.example.mpaz_pro.ui.navigation.GrafoNavegacion
 import com.example.mpaz_pro.ui.theme.MPAZ_PROTheme
-import com.example.mpaz_pro.ui.viewmodel.AuthViewModel
-import com.example.mpaz_pro.ui.viewmodel.StudentViewModel
-import com.example.mpaz_pro.ui.viewmodel.TeacherViewModel
+import com.example.mpaz_pro.ui.viewmodel.AutenticacionViewModel
+import com.example.mpaz_pro.ui.viewmodel.DocenteViewModel
+import com.example.mpaz_pro.ui.viewmodel.EstudianteViewModel
 import com.example.mpaz_pro.ui.viewmodel.UtpViewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val authViewModel: AuthViewModel by viewModels {
-        val app = application as MpazApplication
+    private val autenticacionViewModel: AutenticacionViewModel by viewModels {
+        val app = application as AplicacionMpaz
         object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return AuthViewModel(app.repository) as T
+                return AutenticacionViewModel(app.repositorio) as T
             }
         }
     }
 
     private val utpViewModel: UtpViewModel by viewModels {
-        val app = application as MpazApplication
+        val app = application as AplicacionMpaz
         object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return UtpViewModel(app.repository) as T
+                return UtpViewModel(app.repositorio) as T
             }
         }
     }
 
-    private val teacherViewModel: TeacherViewModel by viewModels {
-        val app = application as MpazApplication
+    private val docenteViewModel: DocenteViewModel by viewModels {
+        val app = application as AplicacionMpaz
         object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return TeacherViewModel(app.repository) as T
+                return DocenteViewModel(app.repositorio) as T
             }
         }
     }
 
-    private val studentViewModel: StudentViewModel by viewModels {
-        val app = application as MpazApplication
+    private val estudianteViewModel: EstudianteViewModel by viewModels {
+        val app = application as AplicacionMpaz
         object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return StudentViewModel(app.repository, app.ttsHelper, app.hapticHelper) as T
+                return EstudianteViewModel(app.repositorio, app.ayudanteTextoAVoz, app.ayudanteVibracion) as T
             }
         }
     }
@@ -70,13 +70,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController()
-                    AppNavHost(
-                        navController = navController,
-                        authViewModel = authViewModel,
+                    val controladorNavegacion = rememberNavController()
+                    GrafoNavegacion(
+                        controladorNavegacion = controladorNavegacion,
+                        autenticacionViewModel = autenticacionViewModel,
                         utpViewModel = utpViewModel,
-                        teacherViewModel = teacherViewModel,
-                        studentViewModel = studentViewModel
+                        docenteViewModel = docenteViewModel,
+                        estudianteViewModel = estudianteViewModel
                     )
                 }
             }

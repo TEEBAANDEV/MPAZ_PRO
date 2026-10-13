@@ -33,16 +33,16 @@ El proyecto ha sido estructurado siguiendo estrictamente las mejores prácticas 
 * **Entorno de Desarrollo:** Android Studio
 * **Interfaz de Usuario:** Jetpack Compose + Material Design 3
 * **Arquitectura:** **MVVM (Model - View - ViewModel)** con flujo unidireccional de datos (UDF) y separación de responsabilidades:
-  * `data/local/entity`: Entidades de Room para usuarios, asignaturas, objetivos curriculares, lecciones, desafíos, pruebas, progreso e informes.
-  * `data/local/dao`: Interfaces DAO con consultas reactivas (`Flow`) y operaciones suspendidas (`suspend`).
-  * `data/local`: Base de datos SQLite (`AppDatabase`) y pre-población de datos semilla (`DatabaseInitializer`).
-  * `data/repository`: `AppRepository` centralizando las fuentes de datos.
-  * `domain/validation`: Capa de dominio con lógica de validación centralizada y desacoplada de la interfaz (`FormValidators`, `ValidationResult`).
-  * `native`: Servicios y controladores de recursos nativos del dispositivo (`TextToSpeechHelper`, `HapticFeedbackHelper`, `ShareReportHelper`).
-  * `ui/components`: Componentes reutilizables con validación visual por campo e indicadores de estado.
-  * `ui/screens`: Vistas modulares segmentadas por rol (`utp`, `teacher`, `student`).
-  * `ui/viewmodel`: ViewModels reactivos (`AuthViewModel`, `UtpViewModel`, `TeacherViewModel`, `StudentViewModel`) exponiendo `StateFlow`.
-  * `ui/navigation`: Navegación desacoplada con Navigation Compose (`AppNavHost`, `Screen`).
+  * `data/local/entity`: Entidades de Room en español (`UsuarioEntity`, `AsignaturaEntity`, `ObjetivoAprendizajeEntity`, `ContenidoDidacticoEntity`, `DesafioEntity`, `PreguntaEvaluacionEntity`, `ProgresoEstudianteEntity`, `InformePedagogicoEntity`).
+  * `data/local/dao`: Interfaces DAO con consultas reactivas (`Flow`) y operaciones suspendidas (`UsuarioDao`, `ObjetivoAprendizajeDao`, `DocenteDao`, etc.).
+  * `data/local`: Base de datos SQLite (`BaseDatosApp`) y pre-población de datos semilla (`InicializadorBaseDatos`).
+  * `data/repository`: `RepositorioApp` centralizando las fuentes de datos.
+  * `domain/validation`: Capa de dominio con lógica de validación centralizada y desacoplada de la interfaz (`ValidadoresFormulario`, `ResultadoValidacion`).
+  * `native`: Servicios y controladores de recursos nativos del dispositivo (`AyudanteTextoAVoz`, `AyudanteVibracion`, `AyudanteCompartirInforme`).
+  * `ui/components`: Componentes reutilizables con validación visual por campo e indicadores de estado (`CampoTextoMpaz`, `BotonAltavozAudio`, `InsigniaEstado`, `BarraSuperiorMpaz`).
+  * `ui/screens`: Vistas modulares segmentadas por rol (`PantallaInicioSesion`, `utp/`, `docente/`, `estudiante/`).
+  * `ui/viewmodel`: ViewModels reactivos (`AutenticacionViewModel`, `UtpViewModel`, `DocenteViewModel`, `EstudianteViewModel`) exponiendo `StateFlow`.
+  * `ui/navigation`: Navegación desacoplada con Navigation Compose (`GrafoNavegacion`, `DestinoNavegacion`).
 
 ---
 
@@ -50,11 +50,11 @@ El proyecto ha sido estructurado siguiendo estrictamente las mejores prácticas 
 
 Para cumplir y superar el indicador de logro que exige el acceso a al menos **dos recursos nativos del dispositivo** integrados con coherencia en la interfaz:
 
-1. **Text-To-Speech Nativo de Android (`android.speech.tts.TextToSpeech`):**
-   * *Justificación pedagógica:* En segundo básico los alumnos son lectores iniciales en proceso de autonomía. La app proporciona un botón parlante interactivo (`AudioSpeakerButton`) que lee con voz clara en español chileno/latino las explicaciones didácticas, enunciados de actividades y preguntas de evaluación sin requerir grabaciones externas ni streaming pesado.
-2. **Retroalimentación Háptica / Vibración Física (`android.os.Vibrator` & `VibrationEffect`):**
+1. **Text-To-Speech Nativo de Android (`AyudanteTextoAVoz` / `android.speech.tts.TextToSpeech`):**
+   * *Justificación pedagógica:* En segundo básico los alumnos son lectores iniciales en proceso de autonomía. La app proporciona un botón parlante interactivo (`BotonAltavozAudio`) que lee con voz clara en español chileno/latino las explicaciones didácticas, enunciados de actividades y preguntas de evaluación sin requerir grabaciones externas ni streaming pesado.
+2. **Retroalimentación Háptica / Vibración Física (`AyudanteVibracion` / `android.os.Vibrator` & `VibrationEffect`):**
    * *Justificación pedagógica:* Proporciona feedback táctil inmediato en los desafíos: vibración suave al acertar una respuesta, vibración de doble alerta al equivocarse para motivar al reintento, y patrón rítmico de celebración al finalizar la evaluación.
-3. **Compartición Nativa de Reportes (`Intent.ACTION_SEND`):**
+3. **Compartición Nativa de Reportes (`AyudanteCompartirInforme` / `Intent.ACTION_SEND`):**
    * *Justificación pedagógica:* Permite al docente descargar y exportar los informes pedagógicos individuales consolidados hacia correo electrónico, WhatsApp o aplicaciones de notas del sistema.
 
 ---
