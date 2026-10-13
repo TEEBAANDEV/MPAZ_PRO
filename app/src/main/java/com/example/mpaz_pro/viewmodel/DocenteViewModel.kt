@@ -1,4 +1,4 @@
-package com.example.mpaz_pro.ui.viewmodel
+﻿package com.example.mpaz_pro.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -16,7 +16,7 @@ data class EstadoFormularioAsignacion(
     val idObjetivo: String = "",
     val codigoObjetivo: String = "",
     val tituloObjetivo: String = "",
-    val curso: String = "2° Básico A",
+    val curso: String = "2┬░ B├ísico A",
     val entradaIntentosMaximos: String = "2",
     val entradaFechaInicio: String = "2026-03-25",
     val entradaFechaFin: String = "2026-04-30",
@@ -132,7 +132,7 @@ class DocenteViewModel(private val repositorio: RepositorioApp) : ViewModel() {
                 fechaInicio = estado.entradaFechaInicio.trim(),
                 fechaFin = estado.entradaFechaFin.trim()
             )
-            _formularioAsignacion.update { it.copy(mensajeExito = "Asignación guardada para el curso 2° Básico") }
+            _formularioAsignacion.update { it.copy(mensajeExito = "Asignaci├│n guardada para el curso 2┬░ B├ísico") }
             alTenerExito()
         }
     }

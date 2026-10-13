@@ -1,4 +1,4 @@
-package com.example.mpaz_pro.ui.screens
+﻿package com.example.mpaz_pro.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.mpaz_pro.data.local.entity.RolUsuario
 import com.example.mpaz_pro.ui.components.CampoTextoMpaz
-import com.example.mpaz_pro.ui.viewmodel.AutenticacionViewModel
+import com.example.mpaz_pro.viewmodel.AutenticacionViewModel
 
 @Composable
 fun PantallaInicioSesion(
@@ -223,3 +223,4 @@ fun PantallaInicioSesion(
         }
     }
 }
+

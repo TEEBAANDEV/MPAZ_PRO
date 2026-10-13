@@ -1,4 +1,4 @@
-package com.example.mpaz_pro.ui.viewmodel
+﻿package com.example.mpaz_pro.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -77,7 +77,7 @@ class EstudianteViewModel(
         ayudanteVoz.detener()
     }
 
-    // --- ACTIVIDADES / DESAFÍOS ---
+    // --- ACTIVIDADES / DESAF├ìOS ---
     fun cargarDesafiosParaObjetivo(idObjetivo: String) {
         ayudanteVoz.detener()
         _estadoDesafio.value = EstadoDesafio()
@@ -134,7 +134,7 @@ class EstudianteViewModel(
         }
     }
 
-    // --- EVALUACIÓN FINAL ---
+    // --- EVALUACI├ôN FINAL ---
     fun cargarEvaluacionParaObjetivo(idEstudiante: String, objetivo: ObjetivoAprendizajeEntity) {
         ayudanteVoz.detener()
         viewModelScope.launch {
@@ -221,7 +221,7 @@ class EstudianteViewModel(
             )
             repositorio.guardarProgreso(progresoActualizado)
 
-            // Guardar reporte pedagógico reservado para el docente
+            // Guardar reporte pedag├│gico reservado para el docente
             val informe = InformePedagogicoEntity(
                 id = "rep_${estudiante.id}_${objetivo.id}",
                 idEstudiante = estudiante.id,
@@ -233,8 +233,8 @@ class EstudianteViewModel(
                 puntajeGlobal = puntajeTotal,
                 puntajeMaximo = maximoPuntos,
                 porcentaje = porcentajeCalculado,
-                fortalezas = if (porcentajeCalculado >= 60) "Logra resolver con éxito los ejercicios del objetivo evaluado." else "Participa activamente en la resolución guiada.",
-                areasRefuerzo = if (porcentajeCalculado < 60) "Reforzar comprensión de instrucciones y repasar contenidos clave con el docente." else "Mantener práctica constante.",
+                fortalezas = if (porcentajeCalculado >= 60) "Logra resolver con ├®xito los ejercicios del objetivo evaluado." else "Participa activamente en la resoluci├│n guiada.",
+                areasRefuerzo = if (porcentajeCalculado < 60) "Reforzar comprensi├│n de instrucciones y repasar contenidos clave con el docente." else "Mantener pr├íctica constante.",
                 observacionDocente = "",
                 fechaEmision = marcaTiempo,
                 estaValidadoPorDocente = false

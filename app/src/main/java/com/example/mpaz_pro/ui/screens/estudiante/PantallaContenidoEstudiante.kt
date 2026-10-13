@@ -1,4 +1,4 @@
-package com.example.mpaz_pro.ui.screens.estudiante
+﻿package com.example.mpaz_pro.ui.screens.estudiante
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mpaz_pro.ui.components.BarraSuperiorMpaz
 import com.example.mpaz_pro.ui.components.BotonAltavozAudio
-import com.example.mpaz_pro.ui.viewmodel.EstudianteViewModel
+import com.example.mpaz_pro.viewmodel.EstudianteViewModel
 
 @Composable
 fun PantallaContenidoEstudiante(
@@ -193,3 +193,4 @@ fun PantallaContenidoEstudiante(
         }
     }
 }
+

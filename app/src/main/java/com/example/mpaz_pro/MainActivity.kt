@@ -1,4 +1,4 @@
-package com.example.mpaz_pro
+﻿package com.example.mpaz_pro
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,10 +14,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.rememberNavController
 import com.example.mpaz_pro.ui.navigation.GrafoNavegacion
 import com.example.mpaz_pro.ui.theme.MPAZ_PROTheme
-import com.example.mpaz_pro.ui.viewmodel.AutenticacionViewModel
-import com.example.mpaz_pro.ui.viewmodel.DocenteViewModel
-import com.example.mpaz_pro.ui.viewmodel.EstudianteViewModel
-import com.example.mpaz_pro.ui.viewmodel.UtpViewModel
+import com.example.mpaz_pro.viewmodel.AutenticacionViewModel
+import com.example.mpaz_pro.viewmodel.DocenteViewModel
+import com.example.mpaz_pro.viewmodel.EstudianteViewModel
+import com.example.mpaz_pro.viewmodel.UtpViewModel
 
 class MainActivity : ComponentActivity() {
 

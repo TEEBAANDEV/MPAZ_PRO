@@ -17,9 +17,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.mpaz_pro.data.local.entity.EstadoObjetivo
 import com.example.mpaz_pro.data.local.entity.ObjetivoAprendizajeEntity
+import com.example.mpaz_pro.ui.components.AppBottomBar
+import com.example.mpaz_pro.ui.components.AppDrawer
 import com.example.mpaz_pro.ui.components.BarraSuperiorMpaz
 import com.example.mpaz_pro.ui.components.InsigniaEstado
-import com.example.mpaz_pro.ui.viewmodel.UtpViewModel
+import com.example.mpaz_pro.viewmodel.UtpViewModel
 
 @Composable
 fun PantallaPrincipalUtp(
@@ -31,92 +33,122 @@ fun PantallaPrincipalUtp(
     val asignaturas by viewModel.asignaturas.collectAsState()
     val objetivos by viewModel.todosLosObjetivos.collectAsState()
     val idAsignaturaSeleccionada by viewModel.idAsignaturaSeleccionada.collectAsState()
+    var elementoInferiorSeleccionado by remember { mutableStateOf("inicio") }
 
     val objetivosFiltrados = remember(objetivos, idAsignaturaSeleccionada) {
         if (idAsignaturaSeleccionada == null) objetivos
         else objetivos.filter { it.idAsignatura == idAsignaturaSeleccionada }
     }
 
-    Scaffold(
-        topBar = {
-            BarraSuperiorMpaz(
-                titulo = "Jefatura UTP - MPAZ PRO",
-                subtitulo = "Administración Curricular de 2° Básico",
-                alCerrarSesion = alCerrarSesion
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    viewModel.reiniciarFormulario(idAsignaturaSeleccionada ?: "asig_lenguaje")
-                    alCrearNuevoObjetivo()
-                },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Nuevo Objetivo de Aprendizaje")
+    AppDrawer(
+        pantallaActual = "Panel Principal",
+        nombreUsuario = "Jefatura UTP",
+        rolUsuario = "Administración Curricular",
+        onPantallaSeleccionada = { opcion ->
+            when (opcion) {
+                "Panel Principal" -> viewModel.seleccionarAsignatura(null)
+                "Módulos de Aprendizaje" -> viewModel.seleccionarAsignatura("asig_lenguaje")
+                "Seguimiento e Informes" -> {}
             }
-        }
-    ) { rellenoInterno ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(rellenoInterno)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Asignaturas Principales (4)",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+        },
+        onCerrarSesion = alCerrarSesion
+    ) { abrirMenu ->
+        Scaffold(
+            topBar = {
+                BarraSuperiorMpaz(
+                    titulo = "Jefatura UTP - MPAZ PRO",
+                    subtitulo = "Administración Curricular 2° Básico",
+                    alAbrirMenu = { abrirMenu() },
+                    alCerrarSesion = alCerrarSesion
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+            },
+            bottomBar = {
+                AppBottomBar(
+                    elementoSeleccionado = elementoInferiorSeleccionado,
+                    alSeleccionarElemento = { id ->
+                        elementoInferiorSeleccionado = id
+                        when (id) {
+                            "inicio" -> viewModel.seleccionarAsignatura(null)
+                            "modulos" -> viewModel.seleccionarAsignatura("asig_lenguaje")
+                            "perfil" -> alCerrarSesion()
+                        }
+                    }
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.reiniciarFormulario(idAsignaturaSeleccionada ?: "asig_lenguaje")
+                        alCrearNuevoObjetivo()
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
-                    FilterChip(
-                        selected = idAsignaturaSeleccionada == null,
-                        onClick = { viewModel.seleccionarAsignatura(null) },
-                        label = { Text("Todas") }
+                    Icon(Icons.Default.Add, contentDescription = "Nuevo Objetivo de Aprendizaje")
+                }
+            }
+        ) { rellenoInterno ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(rellenoInterno)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Filtro Curricular por Asignatura (2° Básico)",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    asignaturas.forEach { asignatura ->
-                        FilterChip(
-                            selected = idAsignaturaSeleccionada == asignatura.id,
-                            onClick = { viewModel.seleccionarAsignatura(asignatura.id) },
-                            label = { Text(asignatura.codigo) }
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    ScrollableTabRow(
+                        selectedTabIndex = asignaturas.indexOfFirst { it.id == idAsignaturaSeleccionada }.let { if (it >= 0) it + 1 else 0 },
+                        edgePadding = 0.dp
+                    ) {
+                        Tab(
+                            selected = idAsignaturaSeleccionada == null,
+                            onClick = { viewModel.seleccionarAsignatura(null) },
+                            text = { Text("Todas (4 Asignaturas)") }
                         )
+                        asignaturas.forEach { asig ->
+                            Tab(
+                                selected = idAsignaturaSeleccionada == asig.id,
+                                onClick = { viewModel.seleccionarAsignatura(asig.id) },
+                                text = { Text(asig.nombre) }
+                            )
+                        }
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-            }
 
-            item {
-                Text(
-                    text = "Objetivos y Unidades Didácticas (${objetivosFiltrados.size})",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+                item {
+                    Text(
+                        text = "Objetivos Curriculares (${objetivosFiltrados.size})",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
-            items(objetivosFiltrados, key = { it.id }) { objetivo ->
-                TarjetaObjetivoUtp(
-                    objetivo = objetivo,
-                    alHacerClicEditar = {
-                        viewModel.cargarObjetivoParaEditar(objetivo)
-                        alNavegarAEditar(objetivo.id)
-                    },
-                    alAprobarRapido = {
-                        viewModel.actualizarEstadoRapido(objetivo.id, EstadoObjetivo.AUTORIZADO)
-                    }
-                )
-            }
+                items(objetivosFiltrados, key = { it.id }) { objetivo ->
+                    TarjetaObjetivoUtp(
+                        objetivo = objetivo,
+                        alHacerClicEditar = {
+                            viewModel.cargarObjetivoParaEditar(objetivo)
+                            alNavegarAEditar(objetivo.id)
+                        },
+                        alAutorizar = {
+                            viewModel.cambiarEstadoObjetivo(objetivo.id, EstadoObjetivo.AUTORIZADO)
+                        }
+                    )
+                }
 
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
+                item {
+                    Spacer(modifier = Modifier.height(60.dp))
+                }
             }
         }
     }
@@ -126,12 +158,11 @@ fun PantallaPrincipalUtp(
 fun TarjetaObjetivoUtp(
     objetivo: ObjetivoAprendizajeEntity,
     alHacerClicEditar: () -> Unit,
-    alAprobarRapido: () -> Unit
+    alAutorizar: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize()
@@ -146,20 +177,19 @@ fun TarjetaObjetivoUtp(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer
+                ) {
                     Text(
                         text = objetivo.codigo,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "• ${objetivo.tituloUnidad}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
+
                 InsigniaEstado(estado = objetivo.estado)
             }
 
@@ -167,55 +197,58 @@ fun TarjetaObjetivoUtp(
 
             Text(
                 text = objetivo.titulo,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = objetivo.descripcion,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                Text(
+                    text = "Ref: ${objetivo.textoReferencia}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
                 Text(
                     text = "Eje: ${objetivo.ejeCurricular}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.outline
                 )
+            }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (objetivo.estado == EstadoObjetivo.EN_REVISION || objetivo.estado == EstadoObjetivo.BORRADOR) {
-                        FilledTonalButton(
-                            onClick = alAprobarRapido,
-                            shape = RoundedCornerShape(8.dp),
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
-                        ) {
-                            Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = "Autorizar", style = MaterialTheme.typography.labelSmall)
-                        }
-                    }
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
-                    IconButton(onClick = alHacerClicEditar) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Editar objetivo",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (objetivo.estado != EstadoObjetivo.AUTORIZADO) {
+                    OutlinedButton(
+                        onClick = alAutorizar,
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Autorizar")
                     }
+                }
+
+                FilledTonalButton(onClick = alHacerClicEditar) {
+                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Editar")
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.example.mpaz_pro.ui.viewmodel
+package com.example.mpaz_pro.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,7 +18,7 @@ data class EstadoFormularioObjetivo(
     val entradaDescripcion: String = "",
     val entradaUnidad: String = "Unidad 1",
     val entradaEje: String = "Lectura",
-    val entradaTextoReferencia: String = "Texto Escolar Mineduc 2°",
+    val entradaTextoReferencia: String = "Texto Escolar Mineduc 2┬░",
     val estado: EstadoObjetivo = EstadoObjetivo.BORRADOR,
     val errorCodigo: String? = null,
     val errorTitulo: String? = null,
@@ -161,4 +161,7 @@ class UtpViewModel(private val repositorio: RepositorioApp) : ViewModel() {
             repositorio.actualizarEstadoObjetivo(idObjetivo, nuevoEstado)
         }
     }
+
+    fun cambiarEstadoObjetivo(idObjetivo: String, nuevoEstado: EstadoObjetivo) =
+        actualizarEstadoRapido(idObjetivo, nuevoEstado)
 }

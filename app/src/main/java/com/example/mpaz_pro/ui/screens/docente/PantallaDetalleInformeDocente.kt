@@ -1,4 +1,4 @@
-package com.example.mpaz_pro.ui.screens.docente
+﻿package com.example.mpaz_pro.ui.screens.docente
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.mpaz_pro.ui.components.BarraSuperiorMpaz
 import com.example.mpaz_pro.ui.components.CampoTextoMpaz
-import com.example.mpaz_pro.ui.viewmodel.DocenteViewModel
+import com.example.mpaz_pro.viewmodel.DocenteViewModel
 
 @Composable
 fun PantallaDetalleInformeDocente(
@@ -221,3 +221,4 @@ fun PantallaDetalleInformeDocente(
         }
     }
 }
+

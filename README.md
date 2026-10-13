@@ -32,17 +32,25 @@ El proyecto ha sido estructurado siguiendo estrictamente las mejores prácticas 
 * **Lenguaje:** Kotlin 2.2.10
 * **Entorno de Desarrollo:** Android Studio
 * **Interfaz de Usuario:** Jetpack Compose + Material Design 3
-* **Arquitectura:** **MVVM (Model - View - ViewModel)** con flujo unidireccional de datos (UDF) y separación de responsabilidades:
-  * `data/local/entity`: Entidades de Room en español (`UsuarioEntity`, `AsignaturaEntity`, `ObjetivoAprendizajeEntity`, `ContenidoDidacticoEntity`, `DesafioEntity`, `PreguntaEvaluacionEntity`, `ProgresoEstudianteEntity`, `InformePedagogicoEntity`).
-  * `data/local/dao`: Interfaces DAO con consultas reactivas (`Flow`) y operaciones suspendidas (`UsuarioDao`, `ObjetivoAprendizajeDao`, `DocenteDao`, etc.).
-  * `data/local`: Base de datos SQLite (`BaseDatosApp`) y pre-población de datos semilla (`InicializadorBaseDatos`).
-  * `data/repository`: `RepositorioApp` centralizando las fuentes de datos.
-  * `domain/validation`: Capa de dominio con lógica de validación centralizada y desacoplada de la interfaz (`ValidadoresFormulario`, `ResultadoValidacion`).
-  * `native`: Servicios y controladores de recursos nativos del dispositivo (`AyudanteTextoAVoz`, `AyudanteVibracion`, `AyudanteCompartirInforme`).
-  * `ui/components`: Componentes reutilizables con validación visual por campo e indicadores de estado (`CampoTextoMpaz`, `BotonAltavozAudio`, `InsigniaEstado`, `BarraSuperiorMpaz`).
-  * `ui/screens`: Vistas modulares segmentadas por rol (`PantallaInicioSesion`, `utp/`, `docente/`, `estudiante/`).
-  * `ui/viewmodel`: ViewModels reactivos (`AutenticacionViewModel`, `UtpViewModel`, `DocenteViewModel`, `EstudianteViewModel`) exponiendo `StateFlow`.
-  * `ui/navigation`: Navegación desacoplada con Navigation Compose (`GrafoNavegacion`, `DestinoNavegacion`).
+* **Arquitectura:** **MVVM (Model - View - ViewModel)** organizada según la guía oficial de clase (*Arquitectura de una APP* - Docente Carlos Abarzúa Castro):
+  * `app/`: Punto de entrada (`MainActivity.kt`, `AplicacionMpaz.kt`).
+  * `data/`:
+    * `data/model/`: Modelos de datos y estados de formulario (`ModelosFormulario.kt` con `FormularioLoginModel`, `FormularioObjetivoModel`, `FormularioInformeModel`, `Formulario...Errores`).
+    * `data/repository/`: `RepositorioApp` centralizando operaciones con Room.
+    * `data/local/`: Base de datos SQLite Room (`BaseDatosApp`, DAOs y entidades Room en español).
+  * `viewmodel/`: Capa ViewModel que conecta los datos con la interfaz (`AutenticacionViewModel`, `UtpViewModel`, `DocenteViewModel`, `EstudianteViewModel`) usando `StateFlow` y validaciones reactivas por campo (patrón `MiAppFormulario`).
+  * `ui/`:
+    * `ui/components`: Elementos reutilizables basados en los proyectos de clase:
+      * `AppDrawer.kt`: Menú lateral deslizante (`ModalNavigationDrawer` + `ModalDrawerSheet` + `NavigationDrawerItem`) basado en *MenuDeslizanteCompose*.
+      * `AppTopBar.kt`: Barra superior con control de menú hamburguesa.
+      * `NuevoMenu.kt`: Menú desplegable contextual en barra superior basado en *AppMenu2.0* y *MiApp2.0*.
+      * `AppBottomBar.kt`: Barra de navegación inferior (`NavigationBar` + `NavigationBarItem`) basado en *MiApp2.0*.
+      * `CampoTextoMpaz.kt`, `BotonAltavozAudio.kt`, `InsigniaEstado.kt`, `BarraSuperiorMpaz.kt`.
+    * `ui/screens`: Pantallas completas segmentadas por perfil (`PantallaInicioSesion`, `utp/`, `docente/`, `estudiante/`).
+    * `ui/theme`: Colores, tipografías y tema visual (*Theme.kt*, *Color.kt*, *Type.kt*).
+    * `ui/navigation`: Navegación con Navigation Compose (`GrafoNavegacion`, `DestinoNavegacion`).
+  * `native/`: Acceso a recursos de hardware nativos (`AyudanteTextoAVoz`, `AyudanteVibracion`, `AyudanteCompartirInforme`).
+  * `domain/validation/`: Lógica de validación desacoplada de la interfaz (`ValidadoresFormulario`, `ResultadoValidacion`).
 
 ---
 

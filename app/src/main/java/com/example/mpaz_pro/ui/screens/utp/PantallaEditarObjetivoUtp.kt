@@ -1,4 +1,4 @@
-package com.example.mpaz_pro.ui.screens.utp
+﻿package com.example.mpaz_pro.ui.screens.utp
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -23,7 +23,7 @@ import com.example.mpaz_pro.data.local.entity.EstadoObjetivo
 import com.example.mpaz_pro.ui.components.BarraSuperiorMpaz
 import com.example.mpaz_pro.ui.components.CampoTextoMpaz
 import com.example.mpaz_pro.ui.components.InsigniaEstado
-import com.example.mpaz_pro.ui.viewmodel.UtpViewModel
+import com.example.mpaz_pro.viewmodel.UtpViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -201,3 +201,4 @@ fun PantallaEditarObjetivoUtp(
         }
     }
 }
+

@@ -1,4 +1,4 @@
-package com.example.mpaz_pro.ui.viewmodel
+﻿package com.example.mpaz_pro.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -77,7 +77,7 @@ class AutenticacionViewModel(private val repositorio: RepositorioApp) : ViewMode
                 _estadoUi.update {
                     it.copy(
                         estaCargando = false,
-                        errorGeneral = "Credenciales incorrectas. Verifique usuario y contraseña."
+                        errorGeneral = "Credenciales incorrectas. Verifique usuario y contrase├▒a."
                     )
                 }
             }

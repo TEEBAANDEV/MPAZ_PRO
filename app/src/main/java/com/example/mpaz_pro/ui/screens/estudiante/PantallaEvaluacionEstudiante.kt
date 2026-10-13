@@ -1,4 +1,4 @@
-package com.example.mpaz_pro.ui.screens.estudiante
+﻿package com.example.mpaz_pro.ui.screens.estudiante
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -26,7 +26,7 @@ import com.example.mpaz_pro.data.local.entity.ObjetivoAprendizajeEntity
 import com.example.mpaz_pro.data.local.entity.UsuarioEntity
 import com.example.mpaz_pro.ui.components.BarraSuperiorMpaz
 import com.example.mpaz_pro.ui.components.BotonAltavozAudio
-import com.example.mpaz_pro.ui.viewmodel.EstudianteViewModel
+import com.example.mpaz_pro.viewmodel.EstudianteViewModel
 
 @Composable
 fun PantallaEvaluacionEstudiante(
@@ -342,3 +342,4 @@ fun PantallaEvaluacionEstudiante(
         }
     }
 }
+

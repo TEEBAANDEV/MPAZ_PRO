@@ -1,4 +1,4 @@
-package com.example.mpaz_pro.ui.navigation
+﻿package com.example.mpaz_pro.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,10 +20,10 @@ import com.example.mpaz_pro.ui.screens.estudiante.PantallaEvaluacionEstudiante
 import com.example.mpaz_pro.ui.screens.estudiante.PantallaPrincipalEstudiante
 import com.example.mpaz_pro.ui.screens.utp.PantallaEditarObjetivoUtp
 import com.example.mpaz_pro.ui.screens.utp.PantallaPrincipalUtp
-import com.example.mpaz_pro.ui.viewmodel.AutenticacionViewModel
-import com.example.mpaz_pro.ui.viewmodel.DocenteViewModel
-import com.example.mpaz_pro.ui.viewmodel.EstudianteViewModel
-import com.example.mpaz_pro.ui.viewmodel.UtpViewModel
+import com.example.mpaz_pro.viewmodel.AutenticacionViewModel
+import com.example.mpaz_pro.viewmodel.DocenteViewModel
+import com.example.mpaz_pro.viewmodel.EstudianteViewModel
+import com.example.mpaz_pro.viewmodel.UtpViewModel
 
 @Composable
 fun GrafoNavegacion(
@@ -198,3 +198,4 @@ fun GrafoNavegacion(
         }
     }
 }
+
