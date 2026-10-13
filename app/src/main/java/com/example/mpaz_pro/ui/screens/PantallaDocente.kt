@@ -1,16 +1,21 @@
 package com.example.mpaz_pro.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,14 +34,14 @@ fun PantallaDocente(
     val objetivos by viewModel.todosLosObjetivos.collectAsState()
     val informes by viewModel.informes.collectAsState()
     var pestañaSeleccionada by remember { mutableStateOf(0) }
-    val titulosPestañas = listOf("Panel Principal", "Módulos de Aprendizaje", "Seguimiento e Informes")
 
     var informeParaEditar by remember { mutableStateOf<InformeEntity?>(null) }
 
     val pantallaActual = when (pestañaSeleccionada) {
         0 -> "Panel Principal"
         1 -> "Módulos de Aprendizaje"
-        else -> "Seguimiento e Informes"
+        2 -> "Seguimiento e Informes"
+        else -> "Perfil del Docente"
     }
 
     AppDrawer(
@@ -66,37 +71,28 @@ fun PantallaDocente(
                     elementoSeleccionado = when (pestañaSeleccionada) {
                         0 -> "inicio"
                         1 -> "modulos"
-                        else -> "informes"
+                        2 -> "informes"
+                        else -> "perfil"
                     },
                     alSeleccionarElemento = { id ->
                         when (id) {
                             "inicio" -> pestañaSeleccionada = 0
                             "modulos" -> pestañaSeleccionada = 1
                             "informes" -> pestañaSeleccionada = 2
-                            "perfil" -> alCerrarSesion()
+                            "perfil" -> pestañaSeleccionada = 3
                         }
                     }
                 )
             }
         ) { padding ->
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                PrimaryTabRow(selectedTabIndex = pestañaSeleccionada) {
-                    titulosPestañas.forEachIndexed { idx, titulo ->
-                        Tab(
-                            selected = pestañaSeleccionada == idx,
-                            onClick = { pestañaSeleccionada = idx },
-                            text = { Text(titulo, fontWeight = FontWeight.SemiBold) }
-                        )
-                    }
-                }
-
                 when (pestañaSeleccionada) {
                     0 -> {
-                        // 1. Panel Principal: Monitoreo en Tiempo Real del Curso
+                        // 1. Inicio / Panel Principal: Monitoreo en Tiempo Real del Curso
                         LazyColumn(
                             modifier = Modifier.fillMaxSize().padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -177,11 +173,18 @@ fun PantallaDocente(
                         }
                     }
                     2 -> {
-                        // 3. Pestaña Informes con Compartir y Editar Observación
+                        // 3. Informes: Seguimiento Pedagógico, Observaciones y Compartir Nativo
                         LazyColumn(
                             modifier = Modifier.fillMaxSize().padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
+                            item {
+                                Text(
+                                    text = "Informes Pedagógicos y Observaciones",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                             items(informes, key = { it.id }) { inf ->
                                 Card(
                                     shape = RoundedCornerShape(12.dp),
@@ -220,6 +223,82 @@ fun PantallaDocente(
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                    3 -> {
+                        // 4. Perfil Institucional del Docente
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "Foto Docente",
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                            }
+
+                            Text(
+                                text = "Prof. Mario Silva",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Docente Titular • 2° Básico A",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+
+                            Card(
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    Text(text = "Información del Usuario", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                                    HorizontalDivider()
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Establecimiento:", color = MaterialTheme.colorScheme.outline)
+                                        Text("Escuela Marcela Paz", fontWeight = FontWeight.Medium)
+                                    }
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Comuna:", color = MaterialTheme.colorScheme.outline)
+                                        Text("San Bernardo", fontWeight = FontWeight.Medium)
+                                    }
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Usuario de Acceso:", color = MaterialTheme.colorScheme.outline)
+                                        Text("docente", fontWeight = FontWeight.Medium)
+                                    }
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Rol Curricular:", color = MaterialTheme.colorScheme.outline)
+                                        Text("Docente de Aula", fontWeight = FontWeight.Medium)
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            OutlinedButton(
+                                onClick = alCerrarSesion,
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Cerrar Sesión")
                             }
                         }
                     }
