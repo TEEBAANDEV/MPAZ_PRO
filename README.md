@@ -94,16 +94,20 @@ Todos los formularios disponen de retroalimentación visual inmediata ante error
 
 ---
 
-## 🔑 7. Credenciales de Prueba (Demostración Rápida)
+## 🔑 7. Credenciales de Acceso y Ramas del Repositorio
 
-La aplicación incluye botones de **Acceso Rápido** en la pantalla de inicio de sesión para facilitar la evaluación presencial del docente:
+Para ingresar en la versión formal (`main`), ingrese las credenciales registradas según el perfil que desee evaluar:
 
-| Perfil | Usuario | Contraseña | Rol en la Aplicación |
+| Perfil | Usuario / RUT | Contraseña | Rol en la Aplicación |
 | :--- | :--- | :--- | :--- |
-| **Jefatura UTP** | `utp` | `1234` | Administra y aprueba las 4 asignaturas y objetivos de aprendizaje. |
-| **Docente 2° Básico** | `docente` | `1234` | Configura disponibilidad, intentos, monitorea alumnos e ingresa observaciones. |
-| **Estudiante** | `lucas` | `1234` | Resuelve lección guiada, desafíos interactivos con voz y prueba final con control de intentos. |
-| **Estudiante 2** | `sofia` | `1234` | Perfil de estudiante para comparar avances e informes pedagógicos. |
+| **Jefatura UTP** | `utp` | `1234` | Administra y aprueba las 4 asignaturas y objetivos curriculares. |
+| **Docente 2° Básico** | `docente` | `1234` | Asigna al curso, monitorea a los estudiantes y registra observaciones. |
+| **Estudiante** | `lucas` | `1234` | Lee contenidos con audio TTS y resuelve desafíos con vibración háptica. |
+
+> [!NOTE]
+> **Ramas disponibles en el repositorio:**
+> * **`main` (Entrega Formal):** Interfaz limpia y formal con login estándar (ingreso por usuario y clave).
+> * **`pruebas` (Demostración Rápida):** Incluye botones de acceso rápido directo ("UTP", "Docente", "Estudiante") en la pantalla de bienvenida para facilitar pruebas ágiles de evaluación presencial.
 
 ---
 

@@ -131,40 +131,6 @@ fun PantallaInicioSesion(
                     }
                 }
             }
-
-            // Botones de acceso rápido para demostración
-            Text(
-                text = "Acceso Rápido de Prueba (Demo):",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.outline
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = { viewModel.accesoRapido("utp", alIniciarSesionConExito) },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("UTP")
-                }
-                OutlinedButton(
-                    onClick = { viewModel.accesoRapido("docente", alIniciarSesionConExito) },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Docente")
-                }
-                OutlinedButton(
-                    onClick = { viewModel.accesoRapido("lucas", alIniciarSesionConExito) },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Estudiante")
-                }
-            }
         }
     }
 }
