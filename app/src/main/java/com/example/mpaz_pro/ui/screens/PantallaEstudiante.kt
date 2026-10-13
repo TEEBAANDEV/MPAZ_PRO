@@ -72,21 +72,23 @@ fun PantallaEstudiante(
                     color = MaterialTheme.colorScheme.primary
                 )
 
-                ScrollableTabRow(
-                    selectedTabIndex = indiceObjetivoActual.coerceAtLeast(0),
-                    edgePadding = 0.dp
-                ) {
-                    objetivos.forEachIndexed { idx, obj ->
-                        Tab(
-                            selected = indiceObjetivoActual == idx,
-                            onClick = {
-                                viewModel.detenerAudio()
-                                indiceObjetivoActual = idx
-                                respuestaSeleccionada = null
-                                mensajeResultado = null
-                            },
-                            text = { Text("${obj.codigo}: ${obj.nombreAsignatura}") }
-                        )
+                if (objetivos.isNotEmpty()) {
+                    ScrollableTabRow(
+                        selectedTabIndex = indiceObjetivoActual.coerceIn(0, objetivos.size - 1),
+                        edgePadding = 0.dp
+                    ) {
+                        objetivos.forEachIndexed { idx, obj ->
+                            Tab(
+                                selected = indiceObjetivoActual == idx,
+                                onClick = {
+                                    viewModel.detenerAudio()
+                                    indiceObjetivoActual = idx
+                                    respuestaSeleccionada = null
+                                    mensajeResultado = null
+                                },
+                                text = { Text("${obj.codigo}: ${obj.nombreAsignatura}") }
+                            )
+                        }
                     }
                 }
 
