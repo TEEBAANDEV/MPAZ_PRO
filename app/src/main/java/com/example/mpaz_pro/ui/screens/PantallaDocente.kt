@@ -105,8 +105,10 @@ fun PantallaDocente(
                                 )
                             }
                             items(informes, key = { it.id }) { inf ->
+                                val estiloAsig = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(inf.asignatura)
                                 Card(
                                     shape = RoundedCornerShape(12.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, estiloAsig.colorBorde),
                                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
@@ -116,15 +118,23 @@ fun PantallaDocente(
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
                                             Text(inf.nombreEstudiante, fontWeight = FontWeight.Bold)
-                                            Text("${inf.porcentajeLogro}% Logro", fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
+                                            Text("${inf.porcentajeLogro}% Logro", fontWeight = FontWeight.ExtraBold, color = estiloAsig.colorPrincipal)
                                         }
                                         Spacer(modifier = Modifier.height(4.dp))
-                                        Text("${inf.curso} • ${inf.asignatura}", style = MaterialTheme.typography.bodySmall)
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = "${estiloAsig.emoji} ${inf.asignatura}",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = estiloAsig.colorPrincipal,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(" • ${inf.curso}", style = MaterialTheme.typography.bodySmall)
+                                        }
                                         Spacer(modifier = Modifier.height(8.dp))
                                         LinearProgressIndicator(
                                             progress = { inf.porcentajeLogro / 100f },
                                             modifier = Modifier.fillMaxWidth().height(8.dp),
-                                            color = MaterialTheme.colorScheme.primary
+                                            color = estiloAsig.colorPrincipal
                                         )
                                     }
                                 }
@@ -145,8 +155,10 @@ fun PantallaDocente(
                                 )
                             }
                             items(objetivos, key = { it.id }) { obj ->
+                                val estiloObj = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(obj.idAsignatura)
                                 Card(
                                     shape = RoundedCornerShape(12.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, estiloObj.colorBorde),
                                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
@@ -157,7 +169,12 @@ fun PantallaDocente(
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
                                             Text(text = "${obj.codigo}: ${obj.titulo}", fontWeight = FontWeight.Bold)
-                                            Text(text = obj.nombreAsignatura, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                                            Text(
+                                                text = "${estiloObj.emoji} ${obj.nombreAsignatura}",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = estiloObj.colorPrincipal,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
                                             Text(
                                                 text = if (obj.asignadoAlCurso) "Visible para estudiantes" else "Oculto para estudiantes",
                                                 style = MaterialTheme.typography.labelSmall
@@ -186,14 +203,24 @@ fun PantallaDocente(
                                 )
                             }
                             items(informes, key = { it.id }) { inf ->
+                                val estiloInf = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(inf.asignatura)
                                 Card(
                                     shape = RoundedCornerShape(12.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, estiloInf.colorBorde),
                                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Column(modifier = Modifier.padding(16.dp)) {
                                         Text(text = inf.nombreEstudiante, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                        Text(text = "${inf.curso} • ${inf.asignatura}", style = MaterialTheme.typography.bodySmall)
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = "${estiloInf.emoji} ${inf.asignatura}",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = estiloInf.colorPrincipal,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(" • ${inf.curso}", style = MaterialTheme.typography.bodySmall)
+                                        }
                                         Spacer(modifier = Modifier.height(6.dp))
                                         Text(text = "Obs: ${inf.observacionDocente}", style = MaterialTheme.typography.bodyMedium)
 

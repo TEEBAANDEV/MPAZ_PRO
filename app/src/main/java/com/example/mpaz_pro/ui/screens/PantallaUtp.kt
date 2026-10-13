@@ -112,8 +112,10 @@ fun PantallaUtp(
                             }
 
                             items(objetivosFiltrados, key = { it.id }) { obj ->
+                                val estiloObj = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(obj.idAsignatura)
                                 Card(
                                     shape = RoundedCornerShape(12.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, estiloObj.colorBorde),
                                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
@@ -125,7 +127,7 @@ fun PantallaUtp(
                                         ) {
                                             SuggestionChip(
                                                 onClick = {},
-                                                label = { Text(obj.codigo, fontWeight = FontWeight.Bold) }
+                                                label = { Text(obj.codigo, fontWeight = FontWeight.Bold, color = estiloObj.colorPrincipal) }
                                             )
                                             Badge(
                                                 containerColor = if (obj.estado == "AUTORIZADO") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
@@ -136,7 +138,12 @@ fun PantallaUtp(
 
                                         Spacer(modifier = Modifier.height(6.dp))
                                         Text(text = obj.titulo, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                                        Text(text = obj.nombreAsignatura, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                                        Text(
+                                            text = "${estiloObj.emoji} ${obj.nombreAsignatura}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = estiloObj.colorPrincipal,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(text = obj.descripcion, style = MaterialTheme.typography.bodyMedium)
 
@@ -191,14 +198,21 @@ fun PantallaUtp(
                             items(modulos) { (id, nombre, desc) ->
                                 val objsModulo = objetivos.filter { it.idAsignatura == id }
                                 val autorizados = objsModulo.count { it.estado == "AUTORIZADO" }
+                                val estiloMod = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(id)
 
                                 Card(
                                     shape = RoundedCornerShape(12.dp),
-                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                                    border = androidx.compose.foundation.BorderStroke(1.5.dp, estiloMod.colorBorde),
+                                    colors = CardDefaults.cardColors(containerColor = estiloMod.colorFondo),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Column(modifier = Modifier.padding(16.dp)) {
-                                        Text(text = nombre, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                        Text(
+                                            text = "${estiloMod.emoji} $nombre",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = estiloMod.colorPrincipal
+                                        )
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(text = desc, style = MaterialTheme.typography.bodySmall)
                                         Spacer(modifier = Modifier.height(8.dp))
@@ -210,7 +224,7 @@ fun PantallaUtp(
                                             Text(
                                                 text = "${objsModulo.size} objetivos ($autorizados autorizados)",
                                                 style = MaterialTheme.typography.labelMedium,
-                                                color = MaterialTheme.colorScheme.primary,
+                                                color = estiloMod.colorPrincipal,
                                                 fontWeight = FontWeight.SemiBold
                                             )
                                             OutlinedButton(
@@ -302,11 +316,17 @@ fun PantallaUtp(
                                 asignaturas.filter { it.first != "todas" }.forEach { (id, nombre) ->
                                     val cant = objetivos.count { it.idAsignatura == id }
                                     val aut = objetivos.count { it.idAsignatura == id && it.estado == "AUTORIZADO" }
+                                    val estilo = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(id)
                                     Row(
                                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(text = nombre, style = MaterialTheme.typography.bodyMedium)
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(estilo.emoji)
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(text = nombre, style = MaterialTheme.typography.bodyMedium, color = estilo.colorPrincipal, fontWeight = FontWeight.SemiBold)
+                                        }
                                         Text(text = "$aut / $cant autorizados", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodySmall)
                                     }
                                 }
