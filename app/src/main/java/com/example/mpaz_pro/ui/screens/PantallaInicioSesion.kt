@@ -1,14 +1,11 @@
-﻿package com.example.mpaz_pro.ui.screens
+package com.example.mpaz_pro.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -20,207 +17,154 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.mpaz_pro.data.local.entity.RolUsuario
-import com.example.mpaz_pro.ui.components.CampoTextoMpaz
 import com.example.mpaz_pro.viewmodel.AutenticacionViewModel
 
 @Composable
 fun PantallaInicioSesion(
     viewModel: AutenticacionViewModel,
-    alIniciarSesionConExito: (RolUsuario) -> Unit
+    alIniciarSesionConExito: (String) -> Unit
 ) {
+    val formulario by viewModel.formulario.collectAsState()
+    val errores by viewModel.errores.collectAsState()
     val estadoUi by viewModel.estadoUi.collectAsState()
-    val estadoDesplazamiento = rememberScrollState()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                        MaterialTheme.colorScheme.surface
-                    )
-                )
-            )
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(estadoDesplazamiento)
-                .padding(24.dp),
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
+            // Icono / Logo de la Escuela
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary,
-                shadowElevation = 6.dp,
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.size(72.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.School,
                         contentDescription = "Escuela Marcela Paz",
                         tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(44.dp)
+                        modifier = Modifier.size(40.dp)
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = "MPAZ PRO 2.º",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.ExtraBold,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
-
             Text(
-                text = "Escuela Escritora Marcela Paz (San Bernardo)\nApoyo Didáctico para Segundo Básico",
+                text = "Escuela Marcela Paz (San Bernardo)\nApoyo Didáctico para Segundo Básico",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            // Tarjeta de Formulario con Validaciones Visuales por Campo
+            // Tarjeta de Formulario (Patrón MiAppFormulario)
             Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
                         text = "Iniciar Sesión",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    CampoTextoMpaz(
-                        valor = estadoUi.entradaUsuario,
-                        alCambiarValor = { viewModel.alCambiarUsuario(it) },
-                        etiqueta = "Nombre de Usuario",
-                        marcadorPosicion = "ej: utp, docente, lucas",
-                        iconoInicio = Icons.Default.Person,
-                        mensajeError = estadoUi.errorUsuario
+                    OutlinedTextField(
+                        value = formulario.rut,
+                        onValueChange = { viewModel.alCambiarUsuario(it) },
+                        label = { Text("Usuario / RUT") },
+                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                        isError = errores.rut != null,
+                        supportingText = { errores.rut?.let { Text(it) } },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    CampoTextoMpaz(
-                        valor = estadoUi.entradaClave,
-                        alCambiarValor = { viewModel.alCambiarClave(it) },
-                        etiqueta = "Contraseña",
-                        marcadorPosicion = "••••",
-                        iconoInicio = Icons.Default.Lock,
-                        mensajeError = estadoUi.errorClave,
-                        transformacionVisual = PasswordVisualTransformation(),
-                        opcionesTeclado = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    OutlinedTextField(
+                        value = formulario.clave,
+                        onValueChange = { viewModel.alCambiarClave(it) },
+                        label = { Text("Contraseña") },
+                        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        isError = errores.clave != null,
+                        supportingText = { errores.clave?.let { Text(it) } },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
                     )
 
-                    AnimatedVisibility(
-                        visible = estadoUi.errorGeneral != null,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
+                    AnimatedVisibility(visible = estadoUi.errorGeneral != null) {
                         Text(
                             text = estadoUi.errorGeneral ?: "",
                             color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 10.dp)
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(20.dp))
-
                     Button(
                         onClick = { viewModel.iniciarSesion(alIniciarSesionConExito) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        enabled = !estadoUi.estaCargando
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        shape = RoundedCornerShape(10.dp)
                     ) {
-                        if (estadoUi.estaCargando) {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(24.dp),
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Text(
-                                text = "Ingresar al Sistema",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+                        Text("Ingresar", fontWeight = FontWeight.Bold)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
+            // Botones de acceso rápido para demostración
             Text(
-                text = "Acceso Rápido por Perfil (Demostración de Evaluación):",
+                text = "Acceso Rápido de Prueba (Demo):",
                 style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.outline
             )
-
-            Spacer(modifier = Modifier.height(12.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedButton(
-                    onClick = { viewModel.accesoRapidoComo("utp", alIniciarSesionConExito) },
+                    onClick = { viewModel.accesoRapido("utp", alIniciarSesionConExito) },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text(text = "UTP", style = MaterialTheme.typography.labelSmall)
+                    Text("UTP")
                 }
-
                 OutlinedButton(
-                    onClick = { viewModel.accesoRapidoComo("docente", alIniciarSesionConExito) },
+                    onClick = { viewModel.accesoRapido("docente", alIniciarSesionConExito) },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text(text = "Docente", style = MaterialTheme.typography.labelSmall)
+                    Text("Docente")
                 }
-
-                Button(
-                    onClick = { viewModel.accesoRapidoComo("lucas", alIniciarSesionConExito) },
+                OutlinedButton(
+                    onClick = { viewModel.accesoRapido("lucas", alIniciarSesionConExito) },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text(text = "Estudiante", style = MaterialTheme.typography.labelSmall)
+                    Text("Estudiante")
                 }
             }
-
-            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
-

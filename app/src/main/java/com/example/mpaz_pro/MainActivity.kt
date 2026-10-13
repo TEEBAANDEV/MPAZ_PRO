@@ -1,4 +1,4 @@
-﻿package com.example.mpaz_pro
+package com.example.mpaz_pro
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,9 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mpaz_pro.ui.navigation.GrafoNavegacion
 import com.example.mpaz_pro.ui.theme.MPAZ_PROTheme
 import com.example.mpaz_pro.viewmodel.AutenticacionViewModel
-import com.example.mpaz_pro.viewmodel.DocenteViewModel
-import com.example.mpaz_pro.viewmodel.EstudianteViewModel
-import com.example.mpaz_pro.viewmodel.UtpViewModel
+import com.example.mpaz_pro.viewmodel.MpazViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -31,32 +29,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private val utpViewModel: UtpViewModel by viewModels {
+    private val mpazViewModel: MpazViewModel by viewModels {
         val app = application as AplicacionMpaz
         object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return UtpViewModel(app.repositorio) as T
-            }
-        }
-    }
-
-    private val docenteViewModel: DocenteViewModel by viewModels {
-        val app = application as AplicacionMpaz
-        object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return DocenteViewModel(app.repositorio) as T
-            }
-        }
-    }
-
-    private val estudianteViewModel: EstudianteViewModel by viewModels {
-        val app = application as AplicacionMpaz
-        object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return EstudianteViewModel(app.repositorio, app.ayudanteTextoAVoz, app.ayudanteVibracion) as T
+                return MpazViewModel(app.repositorio, app.ayudanteTextoAVoz, app.ayudanteVibracion) as T
             }
         }
     }
@@ -74,9 +52,7 @@ class MainActivity : ComponentActivity() {
                     GrafoNavegacion(
                         controladorNavegacion = controladorNavegacion,
                         autenticacionViewModel = autenticacionViewModel,
-                        utpViewModel = utpViewModel,
-                        docenteViewModel = docenteViewModel,
-                        estudianteViewModel = estudianteViewModel
+                        mpazViewModel = mpazViewModel
                     )
                 }
             }

@@ -27,12 +27,12 @@ class AplicacionMpaz : Application() {
     override fun onCreate() {
         super.onCreate()
         baseDatos = BaseDatosApp.obtenerBaseDatos(this)
-        repositorio = RepositorioApp(baseDatos)
+        repositorio = RepositorioApp(baseDatos.appDao())
         ayudanteTextoAVoz = AyudanteTextoAVoz(this)
         ayudanteVibracion = AyudanteVibracion(this)
 
         CoroutineScope(Dispatchers.IO).launch {
-            InicializadorBaseDatos.poblarDatosIniciales(baseDatos)
+            InicializadorBaseDatos.inicializar(baseDatos.appDao())
         }
     }
 

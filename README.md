@@ -34,22 +34,21 @@ El proyecto ha sido estructurado siguiendo estrictamente las mejores prácticas 
 * **Arquitectura:** **MVVM (Model - View - ViewModel)** organizada según la guía oficial de clase (*Arquitectura de una APP* - Docente Carlos Abarzúa Castro):
   * `app/`: Punto de entrada (`MainActivity.kt`, `AplicacionMpaz.kt`).
   * `data/`:
-    * `data/model/`: Modelos de datos y estados de formulario (`ModelosFormulario.kt` con `FormularioLoginModel`, `FormularioObjetivoModel`, `FormularioInformeModel`, `Formulario...Errores`).
-    * `data/repository/`: `RepositorioApp` centralizando operaciones con Room.
-    * `data/local/`: Base de datos SQLite Room (`BaseDatosApp`, DAOs y entidades Room en español).
-  * `viewmodel/`: Capa ViewModel que conecta los datos con la interfaz (`AutenticacionViewModel`, `UtpViewModel`, `DocenteViewModel`, `EstudianteViewModel`) usando `StateFlow` y validaciones reactivas por campo (patrón `MiAppFormulario`).
+    * `data/model/`: Modelos de datos y estados de formulario (`ModelosFormulario.kt` con `FormularioLoginModel`, `FormularioObjetivoModel`, `FormularioObservacionModel` y sus clases de error siguiendo `MiAppFormulario`).
+    * `data/repository/`: `RepositorioApp` centralizando las consultas a Room.
+    * `data/local/`: Base de datos SQLite Room (`BaseDatosApp`, `AppDao` unificado, `Entidades.kt` e `InicializadorBaseDatos`).
+  * `viewmodel/`: ViewModels reactivos (`AutenticacionViewModel` y `MpazViewModel`) con `StateFlow`, conectando Room, recursos nativos y formularios.
   * `ui/`:
     * `ui/components`: Elementos reutilizables basados en los proyectos de clase:
       * `AppDrawer.kt`: Menú lateral deslizante (`ModalNavigationDrawer` + `ModalDrawerSheet` + `NavigationDrawerItem`) basado en *MenuDeslizanteCompose*.
-      * `AppTopBar.kt`: Barra superior con control de menú hamburguesa.
+      * `AppTopBar.kt`: Barra superior con control de menú hamburguesa y opciones.
       * `NuevoMenu.kt`: Menú desplegable contextual en barra superior basado en *AppMenu2.0* y *MiApp2.0*.
       * `AppBottomBar.kt`: Barra de navegación inferior (`NavigationBar` + `NavigationBarItem`) basado en *MiApp2.0*.
-      * `CampoTextoMpaz.kt`, `BotonAltavozAudio.kt`, `InsigniaEstado.kt`, `BarraSuperiorMpaz.kt`.
-    * `ui/screens`: Pantallas completas segmentadas por perfil (`PantallaInicioSesion`, `utp/`, `docente/`, `estudiante/`).
-    * `ui/theme`: Colores, tipografías y tema visual (*Theme.kt*, *Color.kt*, *Type.kt*).
-    * `ui/navigation`: Navegación con Navigation Compose (`GrafoNavegacion`, `DestinoNavegacion`).
+      * `InsigniaEstado.kt`, `BarraSuperiorMpaz.kt`.
+    * `ui/screens`: Pantallas directas de cada perfil (`PantallaInicioSesion.kt`, `PantallaUtp.kt`, `PantallaDocente.kt`, `PantallaEstudiante.kt`).
+    * `ui/theme`: Colores, tipografías y tema visual Material 3 (*Theme.kt*, *Color.kt*, *Type.kt*).
+    * `ui/navigation`: Navegación desacoplada con Navigation Compose (`GrafoNavegacion`, `DestinoNavegacion`).
   * `native/`: Acceso a recursos de hardware nativos (`AyudanteTextoAVoz`, `AyudanteVibracion`, `AyudanteCompartirInforme`).
-  * `domain/validation/`: Lógica de validación desacoplada de la interfaz (`ValidadoresFormulario`, `ResultadoValidacion`).
 
 ---
 

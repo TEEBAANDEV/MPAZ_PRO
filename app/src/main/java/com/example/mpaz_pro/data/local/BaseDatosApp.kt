@@ -4,34 +4,19 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.example.mpaz_pro.data.local.dao.*
-import com.example.mpaz_pro.data.local.entity.*
 
 @Database(
     entities = [
         UsuarioEntity::class,
-        AsignaturaEntity::class,
-        ObjetivoAprendizajeEntity::class,
-        ContenidoDidacticoEntity::class,
-        DesafioEntity::class,
-        PreguntaEvaluacionEntity::class,
-        ProgresoEstudianteEntity::class,
-        InformePedagogicoEntity::class
+        ObjetivoEntity::class,
+        InformeEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
-@TypeConverters(Convertidores::class)
 abstract class BaseDatosApp : RoomDatabase() {
-    abstract fun usuarioDao(): UsuarioDao
-    abstract fun asignaturaDao(): AsignaturaDao
-    abstract fun objetivoAprendizajeDao(): ObjetivoAprendizajeDao
-    abstract fun contenidoDidacticoDao(): ContenidoDidacticoDao
-    abstract fun desafioDao(): DesafioDao
-    abstract fun preguntaEvaluacionDao(): PreguntaEvaluacionDao
-    abstract fun progresoEstudianteDao(): ProgresoEstudianteDao
-    abstract fun informePedagogicoDao(): InformePedagogicoDao
+
+    abstract fun appDao(): AppDao
 
     companion object {
         @Volatile
@@ -42,9 +27,9 @@ abstract class BaseDatosApp : RoomDatabase() {
                 val instancia = Room.databaseBuilder(
                     contexto.applicationContext,
                     BaseDatosApp::class.java,
-                    "mpaz_pro_basedatos"
+                    "mpaz_pro_db"
                 )
-                    .fallbackToDestructiveMigration(true)
+                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCIA = instancia
                 instancia

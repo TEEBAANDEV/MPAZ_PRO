@@ -1,11 +1,11 @@
-﻿package com.example.mpaz_pro.viewmodel
+package com.example.mpaz_pro.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mpaz_pro.data.local.entity.RolUsuario
-import com.example.mpaz_pro.data.local.entity.UsuarioEntity
+import com.example.mpaz_pro.data.local.UsuarioEntity
+import com.example.mpaz_pro.data.model.FormularioLoginErrores
+import com.example.mpaz_pro.data.model.FormularioLoginModel
 import com.example.mpaz_pro.data.repository.RepositorioApp
-import com.example.mpaz_pro.domain.validation.ValidadoresFormulario
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,100 +13,84 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class EstadoAutenticacion(
-    val entradaUsuario: String = "",
-    val entradaClave: String = "",
-    val errorUsuario: String? = null,
-    val errorClave: String? = null,
     val estaCargando: Boolean = false,
     val errorGeneral: String? = null,
     val usuarioActual: UsuarioEntity? = null
 )
 
+/**
+ * ViewModel de autenticación con el patrón de MiAppFormulario
+ * (FormularioLoginModel y FormularioLoginErrores).
+ */
 class AutenticacionViewModel(private val repositorio: RepositorioApp) : ViewModel() {
+
+    private val _formulario = MutableStateFlow(FormularioLoginModel())
+    val formulario: StateFlow<FormularioLoginModel> = _formulario.asStateFlow()
+
+    private val _errores = MutableStateFlow(FormularioLoginErrores())
+    val errores: StateFlow<FormularioLoginErrores> = _errores.asStateFlow()
 
     private val _estadoUi = MutableStateFlow(EstadoAutenticacion())
     val estadoUi: StateFlow<EstadoAutenticacion> = _estadoUi.asStateFlow()
 
     fun alCambiarUsuario(valor: String) {
-        val validacion = ValidadoresFormulario.validarUsuario(valor)
-        _estadoUi.update {
-            it.copy(
-                entradaUsuario = valor,
-                errorUsuario = if (valor.isNotBlank() && !validacion.esValido) validacion.mensajeError else null,
-                errorGeneral = null
-            )
-        }
+        _formulario.value = _formulario.value.copy(rut = valor)
+        _errores.value = _errores.value.copy(rut = null)
+        _estadoUi.update { it.copy(errorGeneral = null) }
     }
 
     fun alCambiarClave(valor: String) {
-        val validacion = ValidadoresFormulario.validarClave(valor)
-        _estadoUi.update {
-            it.copy(
-                entradaClave = valor,
-                errorClave = if (valor.isNotBlank() && !validacion.esValido) validacion.mensajeError else null,
-                errorGeneral = null
-            )
-        }
+        _formulario.value = _formulario.value.copy(clave = valor)
+        _errores.value = _errores.value.copy(clave = null)
+        _estadoUi.update { it.copy(errorGeneral = null) }
     }
 
-    fun iniciarSesion(alTenerExito: (RolUsuario) -> Unit) {
-        val estadoActual = _estadoUi.value
-        val validacionUsuario = ValidadoresFormulario.validarUsuario(estadoActual.entradaUsuario)
-        val validacionClave = ValidadoresFormulario.validarClave(estadoActual.entradaClave)
+    fun validar(): Boolean {
+        val f = _formulario.value
+        val errRut = if (f.rut.isBlank()) "Debe ingresar su usuario o RUT" else null
+        val errClave = if (f.clave.isBlank()) "Debe ingresar su clave" else null
+        val errores = FormularioLoginErrores(errRut, errClave)
+        _errores.value = errores
+        return errores == FormularioLoginErrores()
+    }
 
-        if (!validacionUsuario.esValido || !validacionClave.esValido) {
-            _estadoUi.update {
-                it.copy(
-                    errorUsuario = validacionUsuario.mensajeError,
-                    errorClave = validacionClave.mensajeError
-                )
-            }
-            return
-        }
+    fun iniciarSesion(alTenerExito: (String) -> Unit) {
+        if (!validar()) return
 
+        val f = _formulario.value
         viewModelScope.launch {
             _estadoUi.update { it.copy(estaCargando = true, errorGeneral = null) }
-            val usuario = repositorio.iniciarSesion(
-                estadoActual.entradaUsuario.trim(),
-                estadoActual.entradaClave.trim()
-            )
-            if (usuario != null) {
-                _estadoUi.update { it.copy(estaCargando = false, usuarioActual = usuario, errorGeneral = null) }
-                alTenerExito(usuario.rol)
+            val u = repositorio.iniciarSesion(f.rut.trim(), f.clave.trim())
+            if (u != null) {
+                _estadoUi.update { it.copy(estaCargando = false, usuarioActual = u) }
+                alTenerExito(u.rol)
             } else {
                 _estadoUi.update {
                     it.copy(
                         estaCargando = false,
-                        errorGeneral = "Credenciales incorrectas. Verifique usuario y contrase├▒a."
+                        errorGeneral = "Credenciales incorrectas. Verifique usuario y clave."
                     )
                 }
             }
         }
     }
 
-    fun accesoRapidoComo(nombreUsuario: String, alTenerExito: (RolUsuario) -> Unit) {
+    fun accesoRapido(usuario: String, alTenerExito: (String) -> Unit) {
         viewModelScope.launch {
             _estadoUi.update { it.copy(estaCargando = true, errorGeneral = null) }
-            val usuario = repositorio.iniciarSesion(nombreUsuario, "1234")
-            if (usuario != null) {
-                _estadoUi.update {
-                    it.copy(
-                        entradaUsuario = usuario.nombreUsuario,
-                        entradaClave = "1234",
-                        errorUsuario = null,
-                        errorClave = null,
-                        usuarioActual = usuario,
-                        estaCargando = false
-                    )
-                }
-                alTenerExito(usuario.rol)
-            } else {
-                _estadoUi.update { it.copy(estaCargando = false, errorGeneral = "Usuario demo no encontrado") }
+            val u = repositorio.iniciarSesion(usuario, "1234")
+            if (u != null) {
+                _formulario.value = FormularioLoginModel(u.nombreUsuario, "1234")
+                _errores.value = FormularioLoginErrores()
+                _estadoUi.update { it.copy(estaCargando = false, usuarioActual = u) }
+                alTenerExito(u.rol)
             }
         }
     }
 
     fun cerrarSesion() {
-        _estadoUi.update { EstadoAutenticacion() }
+        _formulario.value = FormularioLoginModel()
+        _errores.value = FormularioLoginErrores()
+        _estadoUi.value = EstadoAutenticacion()
     }
 }
