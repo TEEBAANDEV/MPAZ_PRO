@@ -170,6 +170,7 @@ fun PantallaEstudiante(
                         edgePadding = 0.dp
                     ) {
                         objetivos.forEachIndexed { idx, obj ->
+                            val estiloTab = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(obj.idAsignatura)
                             Tab(
                                 selected = indiceObjetivoActual == idx,
                                 onClick = {
@@ -178,7 +179,17 @@ fun PantallaEstudiante(
                                     respuestaSeleccionada = null
                                     mensajeResultado = null
                                 },
-                                text = { Text("${obj.codigo}: ${obj.nombreAsignatura}") }
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(estiloTab.emoji)
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "${obj.codigo}: ${estiloTab.nombreCorto}",
+                                            fontWeight = if (indiceObjetivoActual == idx) FontWeight.Bold else FontWeight.Normal,
+                                            color = if (indiceObjetivoActual == idx) estiloTab.colorPrincipal else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
                             )
                         }
                     }
@@ -191,10 +202,13 @@ fun PantallaEstudiante(
                         }
                     }
                 } else {
-                    // Tarjeta de Contenido Didáctico con Text-To-Speech Nativo
+                    val estiloActivo = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(objetivoActivo.idAsignatura)
+
+                    // Tarjeta de Contenido Didáctico con Text-To-Speech Nativo y Color de Asignatura
                     Card(
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)),
+                        border = androidx.compose.foundation.BorderStroke(2.dp, estiloActivo.colorBorde),
+                        colors = CardDefaults.cardColors(containerColor = estiloActivo.colorFondo),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -203,12 +217,20 @@ fun PantallaEstudiante(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = objetivoActivo.titulo,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "${estiloActivo.emoji} ${objetivoActivo.nombreAsignatura} • 2° Básico",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = estiloActivo.colorPrincipal
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = objetivoActivo.titulo,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
 
                                 // Botón nativo Text-To-Speech (lectura en voz alta para 2° básico)
                                 IconButton(
@@ -223,7 +245,7 @@ fun PantallaEstudiante(
                                     Icon(
                                         imageVector = if (estaHablando) Icons.Default.Stop else Icons.Default.VolumeUp,
                                         contentDescription = "Escuchar en voz alta",
-                                        tint = MaterialTheme.colorScheme.primary,
+                                        tint = estiloActivo.colorPrincipal,
                                         modifier = Modifier.size(32.dp)
                                     )
                                 }
@@ -232,8 +254,7 @@ fun PantallaEstudiante(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = objetivoActivo.descripcion,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                style = MaterialTheme.typography.bodyLarge
                             )
                         }
                     }
@@ -241,6 +262,7 @@ fun PantallaEstudiante(
                     // Desafío Interactivo con Vibración Háptica Nativa
                     Card(
                         shape = RoundedCornerShape(16.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, estiloActivo.colorBorde),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
