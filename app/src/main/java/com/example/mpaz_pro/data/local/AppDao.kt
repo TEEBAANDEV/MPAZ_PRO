@@ -44,4 +44,19 @@ interface AppDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertarInformes(informes: List<InformeEntity>)
+
+    @Query("SELECT * FROM notas ORDER BY id DESC")
+    fun obtenerTodasLasNotas(): Flow<List<NotaEntity>>
+
+    @Query("SELECT * FROM notas WHERE idEstudiante = :idEstudiante ORDER BY id DESC")
+    fun obtenerNotasPorEstudiante(idEstudiante: String): Flow<List<NotaEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun guardarNota(nota: NotaEntity)
+
+    @Query("DELETE FROM notas WHERE id = :id")
+    suspend fun eliminarNota(id: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertarNotas(notas: List<NotaEntity>)
 }

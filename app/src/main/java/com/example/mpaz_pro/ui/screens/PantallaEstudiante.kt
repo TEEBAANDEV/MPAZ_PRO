@@ -8,6 +8,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.VolumeUp
@@ -20,16 +25,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.mpaz_pro.data.local.UsuarioEntity
+import com.example.mpaz_pro.ui.components.AppBottomBar
 import com.example.mpaz_pro.ui.components.AppDrawer
 import com.example.mpaz_pro.ui.components.BarraSuperiorMpaz
-import com.example.mpaz_pro.viewmodel.MpazViewModel
-
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.School
-import com.example.mpaz_pro.ui.components.AppBottomBar
 import com.example.mpaz_pro.ui.components.ElementoNavegacionInferior
+import com.example.mpaz_pro.viewmodel.MpazViewModel
 
 @Composable
 fun PantallaEstudiante(
@@ -38,19 +38,31 @@ fun PantallaEstudiante(
     alCerrarSesion: () -> Unit
 ) {
     val objetivos by viewModel.objetivosAsignados.collectAsState()
+    val notas by viewModel.todasLasNotas.collectAsState()
     val estaHablando by viewModel.estaHablando.collectAsState()
-    val nombreAlumno = usuarioActual?.nombreCompleto ?: "Lucas"
+    val nombreAlumno = usuarioActual?.nombreCompleto ?: "Lucas González"
+    val idAlumno = usuarioActual?.nombreUsuario ?: "lucas"
 
     var seccionActual by remember { mutableStateOf("Misiones") }
     var indiceObjetivoActual by remember { mutableStateOf(0) }
     var respuestaSeleccionada by remember { mutableStateOf<Int?>(null) }
     var mensajeResultado by remember { mutableStateOf<String?>(null) }
     var estrellasGanadas by remember { mutableStateOf(5) }
+    var pestañaAsignaturaNotas by remember { mutableStateOf("todas") }
 
     val objetivoActivo = objetivos.getOrNull(indiceObjetivoActual)
 
+    val asignaturas = listOf(
+        "todas" to "Todas",
+        "lenguaje" to "Lenguaje",
+        "matematica" to "Matemática",
+        "ciencias" to "Ciencias",
+        "historia" to "Historia"
+    )
+
     val elementosEstudiante = listOf(
         ElementoNavegacionInferior("misiones", "Misiones", Icons.Default.Book),
+        ElementoNavegacionInferior("notas", "Mis Notas", Icons.Default.Assessment),
         ElementoNavegacionInferior("logros", "Mis Logros", Icons.Default.Star),
         ElementoNavegacionInferior("perfil", "Mi Perfil", Icons.Default.Person)
     )
@@ -58,6 +70,7 @@ fun PantallaEstudiante(
     AppDrawer(
         pantallaActual = when (seccionActual) {
             "Misiones" -> "Módulos de Aprendizaje"
+            "Mis Notas" -> "Libro de Calificaciones"
             "Mis Logros" -> "Seguimiento e Informes"
             else -> "Panel Principal"
         },
@@ -66,6 +79,10 @@ fun PantallaEstudiante(
         onPantallaSeleccionada = { seccion ->
             when (seccion) {
                 "Panel Principal", "Módulos de Aprendizaje" -> seccionActual = "Misiones"
+                "Libro de Calificaciones" -> {
+                    viewModel.detenerAudio()
+                    seccionActual = "Mis Notas"
+                }
                 "Seguimiento e Informes" -> {
                     viewModel.detenerAudio()
                     seccionActual = "Mis Logros"
@@ -93,6 +110,7 @@ fun PantallaEstudiante(
                 AppBottomBar(
                     elementoSeleccionado = when (seccionActual) {
                         "Misiones" -> "misiones"
+                        "Mis Notas" -> "notas"
                         "Mis Logros" -> "logros"
                         else -> "perfil"
                     },
@@ -100,6 +118,10 @@ fun PantallaEstudiante(
                     alSeleccionarElemento = { id ->
                         when (id) {
                             "misiones" -> seccionActual = "Misiones"
+                            "notas" -> {
+                                viewModel.detenerAudio()
+                                seccionActual = "Mis Notas"
+                            }
                             "logros" -> {
                                 viewModel.detenerAudio()
                                 seccionActual = "Mis Logros"
@@ -114,6 +136,201 @@ fun PantallaEstudiante(
             }
         ) { padding ->
             when (seccionActual) {
+                "Mis Notas" -> {
+                    val notasDelAlumno = notas.filter { it.idEstudiante == idAlumno }
+                    val notasFiltradas = if (pestañaAsignaturaNotas == "todas") {
+                        notasDelAlumno
+                    } else {
+                        notasDelAlumno.filter { it.idAsignatura == pestañaAsignaturaNotas }
+                    }
+
+                    val promEstudiante = if (notasDelAlumno.isNotEmpty()) notasDelAlumno.map { it.calificacion }.average() else 0.0
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        Card(
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(18.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primary),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = String.format(java.util.Locale.US, "%.1f", promEstudiante),
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = "⭐ Tu Promedio General: ${String.format(java.util.Locale.US, "%.1f", promEstudiante)}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = if (promEstudiante >= 6.0) "¡Excelente trabajo! Eres un gran estudiante 🌟" else "¡Sigue practicando cada día con entusiasmo! 📚",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                                )
+                            }
+                        }
+
+                        ScrollableTabRow(
+                            selectedTabIndex = asignaturas.indexOfFirst { it.first == pestañaAsignaturaNotas }.coerceAtLeast(0),
+                            edgePadding = 0.dp
+                        ) {
+                            asignaturas.forEach { (id, nombre) ->
+                                Tab(
+                                    selected = pestañaAsignaturaNotas == id,
+                                    onClick = { pestañaAsignaturaNotas = id },
+                                    text = { Text(nombre, fontWeight = FontWeight.SemiBold) }
+                                )
+                            }
+                        }
+
+                        if (notasFiltradas.isEmpty()) {
+                            Card(modifier = Modifier.fillMaxWidth()) {
+                                Box(modifier = Modifier.padding(24.dp), contentAlignment = Alignment.Center) {
+                                    Text("Aún no tienes calificaciones registradas en esta asignatura.", style = MaterialTheme.typography.bodyMedium)
+                                }
+                            }
+                        } else {
+                            notasFiltradas.forEach { nota ->
+                                val estiloNota = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(nota.idAsignatura)
+                                val colorNota = when {
+                                    nota.calificacion >= 6.0 -> Color(0xFF16A34A)
+                                    nota.calificacion >= 5.0 -> Color(0xFF2563EB)
+                                    nota.calificacion >= 4.0 -> Color(0xFFD97706)
+                                    else -> Color(0xFFDC2626)
+                                }
+                                val etiquetaLogro = when {
+                                    nota.calificacion >= 6.5 -> "¡Sobresaliente! 🥇"
+                                    nota.calificacion >= 6.0 -> "¡Muy Bueno! 🥈"
+                                    nota.calificacion >= 5.0 -> "¡Bueno! 🥉"
+                                    else -> "¡Aprobado! ✅"
+                                }
+
+                                Card(
+                                    shape = RoundedCornerShape(14.dp),
+                                    border = androidx.compose.foundation.BorderStroke(2.dp, estiloNota.colorBorde),
+                                    colors = CardDefaults.cardColors(containerColor = estiloNota.colorFondo),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.padding(16.dp)) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(estiloNota.emoji, style = MaterialTheme.typography.titleMedium)
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = nota.nombreAsignatura,
+                                                    style = MaterialTheme.typography.labelMedium,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = estiloNota.colorPrincipal
+                                                )
+                                            }
+
+                                            IconButton(
+                                                onClick = {
+                                                    if (estaHablando) {
+                                                        viewModel.detenerAudio()
+                                                    } else {
+                                                        viewModel.reproducirAudio(
+                                                            "En ${nota.nombreAsignatura}, evaluación ${nota.tituloEvaluacion}, tu nota es ${String.format(java.util.Locale.US, "%.1f", nota.calificacion)}. Comentario de tu profesor: ${nota.retroalimentacion}"
+                                                        )
+                                                    }
+                                                }
+                                            ) {
+                                                Icon(
+                                                    imageVector = if (estaHablando) Icons.Default.Stop else Icons.Default.VolumeUp,
+                                                    contentDescription = "Escuchar nota en voz alta",
+                                                    tint = estiloNota.colorPrincipal,
+                                                    modifier = Modifier.size(28.dp)
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = nota.tituloEvaluacion,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = etiquetaLogro,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = colorNota
+                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(8.dp))
+                                                    .background(colorNota)
+                                                    .padding(horizontal = 12.dp, vertical = 4.dp)
+                                            ) {
+                                                Text(
+                                                    text = "Nota: ${String.format(java.util.Locale.US, "%.1f", nota.calificacion)}",
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = Color.White,
+                                                    style = MaterialTheme.typography.titleMedium
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        HorizontalDivider(color = estiloNota.colorBorde.copy(alpha = 0.5f))
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                        Text(
+                                            text = "Prof. Mario Silva:",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = nota.retroalimentacion,
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "Fecha: ${nota.fecha}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.outline
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 "Mis Logros" -> {
                     Column(
                         modifier = Modifier
@@ -280,182 +497,183 @@ fun PantallaEstudiante(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        Text(
+                            text = "Elige tu Misión de Aprendizaje:",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
 
-                Text(
-                    text = "Elige tu Misión de Aprendizaje:",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                if (objetivos.isNotEmpty()) {
-                    ScrollableTabRow(
-                        selectedTabIndex = indiceObjetivoActual.coerceIn(0, objetivos.size - 1),
-                        edgePadding = 0.dp
-                    ) {
-                        objetivos.forEachIndexed { idx, obj ->
-                            val estiloTab = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(obj.idAsignatura)
-                            Tab(
-                                selected = indiceObjetivoActual == idx,
-                                onClick = {
-                                    viewModel.detenerAudio()
-                                    indiceObjetivoActual = idx
-                                    respuestaSeleccionada = null
-                                    mensajeResultado = null
-                                },
-                                text = {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(estiloTab.emoji)
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Text(
-                                            text = "${obj.codigo}: ${estiloTab.nombreCorto}",
-                                            fontWeight = if (indiceObjetivoActual == idx) FontWeight.Bold else FontWeight.Normal,
-                                            color = if (indiceObjetivoActual == idx) estiloTab.colorPrincipal else MaterialTheme.colorScheme.onSurface
-                                        )
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-
-                if (objetivoActivo == null) {
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Box(modifier = Modifier.padding(24.dp), contentAlignment = Alignment.Center) {
-                            Text("No hay misiones asignadas en este momento.")
-                        }
-                    }
-                } else {
-                    val estiloActivo = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(objetivoActivo.idAsignatura)
-
-                    Card(
-                        shape = RoundedCornerShape(16.dp),
-                        border = androidx.compose.foundation.BorderStroke(2.dp, estiloActivo.colorBorde),
-                        colors = CardDefaults.cardColors(containerColor = estiloActivo.colorFondo),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                        if (objetivos.isNotEmpty()) {
+                            ScrollableTabRow(
+                                selectedTabIndex = indiceObjetivoActual.coerceIn(0, objetivos.size - 1),
+                                edgePadding = 0.dp
                             ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = "${estiloActivo.emoji} ${objetivoActivo.nombreAsignatura} • 2° Básico",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = estiloActivo.colorPrincipal
+                                objetivos.forEachIndexed { idx, obj ->
+                                    val estiloTab = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(obj.idAsignatura)
+                                    Tab(
+                                        selected = indiceObjetivoActual == idx,
+                                        onClick = {
+                                            viewModel.detenerAudio()
+                                            indiceObjetivoActual = idx
+                                            respuestaSeleccionada = null
+                                            mensajeResultado = null
+                                        },
+                                        text = {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(estiloTab.emoji)
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(
+                                                    text = "${obj.codigo}: ${estiloTab.nombreCorto}",
+                                                    fontWeight = if (indiceObjetivoActual == idx) FontWeight.Bold else FontWeight.Normal,
+                                                    color = if (indiceObjetivoActual == idx) estiloTab.colorPrincipal else MaterialTheme.colorScheme.onSurface
+                                                )
+                                            }
+                                        }
                                     )
-                                    Spacer(modifier = Modifier.height(2.dp))
+                                }
+                            }
+                        }
+
+                        if (objetivoActivo == null) {
+                            Card(modifier = Modifier.fillMaxWidth()) {
+                                Box(modifier = Modifier.padding(24.dp), contentAlignment = Alignment.Center) {
+                                    Text("No hay misiones asignadas en este momento.")
+                                }
+                            }
+                        } else {
+                            val estiloActivo = com.example.mpaz_pro.ui.theme.ColoresAsignatura.obtenerEstilo(objetivoActivo.idAsignatura)
+
+                            Card(
+                                shape = RoundedCornerShape(16.dp),
+                                border = androidx.compose.foundation.BorderStroke(2.dp, estiloActivo.colorBorde),
+                                colors = CardDefaults.cardColors(containerColor = estiloActivo.colorFondo),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = "${estiloActivo.emoji} ${objetivoActivo.nombreAsignatura} • 2° Básico",
+                                                style = MaterialTheme.typography.labelMedium,
+                                                fontWeight = FontWeight.Bold,
+                                                color = estiloActivo.colorPrincipal
+                                            )
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            Text(
+                                                text = objetivoActivo.titulo,
+                                                style = MaterialTheme.typography.titleMedium,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+
+                                        IconButton(
+                                            onClick = {
+                                                if (estaHablando) {
+                                                    viewModel.detenerAudio()
+                                                } else {
+                                                    viewModel.reproducirAudio("${objetivoActivo.titulo}. ${objetivoActivo.descripcion}. Pregunta: ${objetivoActivo.pregunta}")
+                                                }
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = if (estaHablando) Icons.Default.Stop else Icons.Default.VolumeUp,
+                                                contentDescription = "Escuchar en voz alta",
+                                                tint = estiloActivo.colorPrincipal,
+                                                modifier = Modifier.size(32.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(8.dp))
                                     Text(
-                                        text = objetivoActivo.titulo,
+                                        text = objetivoActivo.descripcion,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
+
+                            Card(
+                                shape = RoundedCornerShape(16.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, estiloActivo.colorBorde),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(
+                                        text = "🎯 Desafío Interactivo:",
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold
                                     )
-                                }
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = objetivoActivo.pregunta,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
 
-                                IconButton(
-                                    onClick = {
-                                        if (estaHablando) {
-                                            viewModel.detenerAudio()
-                                        } else {
-                                            viewModel.reproducirAudio("${objetivoActivo.titulo}. ${objetivoActivo.descripcion}. Pregunta: ${objetivoActivo.pregunta}")
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    val listaOpciones = objetivoActivo.opciones.split(",").map { it.trim() }
+
+                                    listaOpciones.forEachIndexed { opIdx, opcion ->
+                                        val esSeleccionada = respuestaSeleccionada == opIdx
+                                        OutlinedButton(
+                                            onClick = {
+                                                respuestaSeleccionada = opIdx
+                                                viewModel.responderPregunta(opIdx, objetivoActivo) { acierto ->
+                                                    if (acierto) {
+                                                        estrellasGanadas += 1
+                                                        mensajeResultado = "¡CORRECTO! 🎉 Sumaste +1 estrella ⭐ (Tienes $estrellasGanadas)"
+                                                    } else {
+                                                        mensajeResultado = "¡Casi! 💡 Vuelve a escuchar la lectura con el botón de voz 🔊 e inténtalo de nuevo."
+                                                    }
+                                                }
+                                            },
+                                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                            shape = RoundedCornerShape(12.dp),
+                                            colors = if (esSeleccionada) {
+                                                ButtonDefaults.outlinedButtonColors(
+                                                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                                                )
+                                            } else ButtonDefaults.outlinedButtonColors()
+                                        ) {
+                                            Text(
+                                                text = opcion,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.Medium
+                                            )
                                         }
                                     }
-                                ) {
-                                    Icon(
-                                        imageVector = if (estaHablando) Icons.Default.Stop else Icons.Default.VolumeUp,
-                                        contentDescription = "Escuchar en voz alta",
-                                        tint = estiloActivo.colorPrincipal,
-                                        modifier = Modifier.size(32.dp)
-                                    )
-                                }
-                            }
 
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = objetivoActivo.descripcion,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
-                    }
-
-                    Card(
-                        shape = RoundedCornerShape(16.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, estiloActivo.colorBorde),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = "🎯 Desafío Interactivo:",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = objetivoActivo.pregunta,
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.SemiBold
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            val listaOpciones = objetivoActivo.opciones.split(",").map { it.trim() }
-
-                            listaOpciones.forEachIndexed { opIdx, opcion ->
-                                val esSeleccionada = respuestaSeleccionada == opIdx
-                                OutlinedButton(
-                                    onClick = {
-                                        respuestaSeleccionada = opIdx
-                                        viewModel.responderPregunta(opIdx, objetivoActivo) { acierto ->
-                                            if (acierto) {
-                                                estrellasGanadas += 1
-                                                mensajeResultado = "¡CORRECTO! 🎉 Sumaste +1 estrella ⭐ (Tienes $estrellasGanadas)"
-                                            } else {
-                                                mensajeResultado = "¡Casi! 💡 Vuelve a escuchar la lectura con el botón de voz 🔊 e inténtalo de nuevo."
+                                    AnimatedVisibility(visible = mensajeResultado != null) {
+                                        Card(
+                                            shape = RoundedCornerShape(12.dp),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = if (mensajeResultado?.contains("CORRECTO") == true)
+                                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                                                else
+                                                    MaterialTheme.colorScheme.surfaceVariant
+                                            ),
+                                            modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(12.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Text(if (mensajeResultado?.contains("CORRECTO") == true) "🌟" else "💡")
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = mensajeResultado ?: "",
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    fontWeight = FontWeight.Bold
+                                                )
                                             }
                                         }
-                                    },
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = if (esSeleccionada) {
-                                        ButtonDefaults.outlinedButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                                        )
-                                    } else ButtonDefaults.outlinedButtonColors()
-                                ) {
-                                    Text(
-                                        text = opcion,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                }
-                            }
-
-                            AnimatedVisibility(visible = mensajeResultado != null) {
-                                Card(
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = if (mensajeResultado?.contains("CORRECTO") == true)
-                                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                                        else
-                                            MaterialTheme.colorScheme.surfaceVariant
-                                    ),
-                                    modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(if (mensajeResultado?.contains("CORRECTO") == true) "🌟" else "💡")
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = mensajeResultado ?: "",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Bold
-                                        )
                                     }
                                 }
                             }
@@ -466,6 +684,3 @@ fun PantallaEstudiante(
         }
     }
 }
-}
-}
-

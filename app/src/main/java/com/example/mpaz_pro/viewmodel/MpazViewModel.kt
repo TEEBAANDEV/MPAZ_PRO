@@ -4,7 +4,10 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mpaz_pro.data.local.InformeEntity
+import com.example.mpaz_pro.data.local.NotaEntity
 import com.example.mpaz_pro.data.local.ObjetivoEntity
+import com.example.mpaz_pro.data.model.FormularioNotaErrores
+import com.example.mpaz_pro.data.model.FormularioNotaModel
 import com.example.mpaz_pro.data.model.FormularioObjetivoErrores
 import com.example.mpaz_pro.data.model.FormularioObjetivoModel
 import com.example.mpaz_pro.data.model.FormularioObservacionErrores
@@ -29,6 +32,9 @@ class MpazViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val informes: StateFlow<List<InformeEntity>> = repositorio.obtenerTodosLosInformes()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val todasLasNotas: StateFlow<List<NotaEntity>> = repositorio.obtenerTodasLasNotas()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val estaHablando: StateFlow<Boolean> = ayudanteTextoAVoz.estaHablando
@@ -173,6 +179,116 @@ class MpazViewModel(
             reproducirAudio("¡Casi! Inténtalo de nuevo.")
         }
         alVerificar(esCorrecto)
+    }
+
+    private val _formularioNota = MutableStateFlow(FormularioNotaModel())
+    val formularioNota: StateFlow<FormularioNotaModel> = _formularioNota.asStateFlow()
+
+    private val _erroresNota = MutableStateFlow(FormularioNotaErrores())
+    val erroresNota: StateFlow<FormularioNotaErrores> = _erroresNota.asStateFlow()
+
+    fun prepararNuevaNota(
+        idAsignatura: String = "lenguaje",
+        nombreAsignatura: String = "Lenguaje y Comunicación",
+        idEstudiante: String = "lucas",
+        nombreEstudiante: String = "Lucas González"
+    ) {
+        _formularioNota.value = FormularioNotaModel(
+            idNota = "nota_${System.currentTimeMillis()}",
+            idEstudiante = idEstudiante,
+            nombreEstudiante = nombreEstudiante,
+            curso = "2° Básico A",
+            idAsignatura = idAsignatura,
+            nombreAsignatura = nombreAsignatura,
+            tituloEvaluacion = "",
+            calificacionTexto = "",
+            retroalimentacion = ""
+        )
+        _erroresNota.value = FormularioNotaErrores()
+    }
+
+    fun prepararEdicionNota(nota: NotaEntity) {
+        _formularioNota.value = FormularioNotaModel(
+            idNota = nota.id,
+            idEstudiante = nota.idEstudiante,
+            nombreEstudiante = nota.nombreEstudiante,
+            curso = nota.curso,
+            idAsignatura = nota.idAsignatura,
+            nombreAsignatura = nota.nombreAsignatura,
+            tituloEvaluacion = nota.tituloEvaluacion,
+            calificacionTexto = nota.calificacion.toString(),
+            retroalimentacion = nota.retroalimentacion
+        )
+        _erroresNota.value = FormularioNotaErrores()
+    }
+
+    fun actualizarAsignaturaNota(idAsignatura: String, nombreAsignatura: String) {
+        _formularioNota.value = _formularioNota.value.copy(
+            idAsignatura = idAsignatura,
+            nombreAsignatura = nombreAsignatura
+        )
+    }
+
+    fun actualizarTituloEvaluacion(valor: String) {
+        _formularioNota.value = _formularioNota.value.copy(tituloEvaluacion = valor)
+    }
+
+    fun actualizarCalificacionTexto(valor: String) {
+        _formularioNota.value = _formularioNota.value.copy(calificacionTexto = valor)
+    }
+
+    fun actualizarRetroalimentacionNota(valor: String) {
+        _formularioNota.value = _formularioNota.value.copy(retroalimentacion = valor)
+    }
+
+    fun validarFormularioNota(): Boolean {
+        val form = _formularioNota.value
+        val errTitulo = if (form.tituloEvaluacion.isBlank()) "El título de la evaluación es obligatorio" else null
+        val califDouble = form.calificacionTexto.replace(",", ".").toDoubleOrNull()
+        val errCalif = when {
+            form.calificacionTexto.isBlank() -> "Ingrese una nota (ej: 6.5)"
+            califDouble == null -> "Formato inválido. Use números (ej: 6.5)"
+            califDouble < 1.0 || califDouble > 7.0 -> "La nota debe estar entre 1.0 y 7.0"
+            else -> null
+        }
+        val errRetro = if (form.retroalimentacion.isBlank()) "Ingrese la retroalimentación formativa" else null
+
+        val errores = FormularioNotaErrores(errTitulo, errCalif, errRetro)
+        _erroresNota.value = errores
+        return errores == FormularioNotaErrores()
+    }
+
+    fun guardarNota(alTerminar: () -> Unit) {
+        if (!validarFormularioNota()) return
+
+        val form = _formularioNota.value
+        val calif = form.calificacionTexto.replace(",", ".").toDouble()
+        val fechaActual = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(java.util.Date())
+
+        viewModelScope.launch {
+            val nota = NotaEntity(
+                id = form.idNota.ifBlank { "nota_${System.currentTimeMillis()}" },
+                idEstudiante = form.idEstudiante,
+                nombreEstudiante = form.nombreEstudiante,
+                curso = form.curso,
+                idAsignatura = form.idAsignatura,
+                nombreAsignatura = form.nombreAsignatura,
+                tituloEvaluacion = form.tituloEvaluacion.trim(),
+                calificacion = calif,
+                retroalimentacion = form.retroalimentacion.trim(),
+                fecha = fechaActual
+            )
+            repositorio.guardarNota(nota)
+            vibrarAcierto()
+            alTerminar()
+        }
+    }
+
+    fun eliminarNota(id: String) {
+        viewModelScope.launch {
+            repositorio.eliminarNota(id)
+            vibrarAcierto()
+        }
     }
 
     override fun onCleared() {

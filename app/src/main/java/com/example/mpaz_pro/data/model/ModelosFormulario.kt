@@ -38,3 +38,21 @@ data class FormularioObservacionModel(
 data class FormularioObservacionErrores(
     val observacion: String? = null
 )
+
+data class FormularioNotaModel(
+    val idNota: String = "",
+    val idEstudiante: String = "lucas",
+    val nombreEstudiante: String = "Lucas González",
+    val curso: String = "2° Básico A",
+    val idAsignatura: String = "lenguaje",
+    val nombreAsignatura: String = "Lenguaje y Comunicación",
+    val tituloEvaluacion: String = "",
+    val calificacionTexto: String = "",
+    val retroalimentacion: String = ""
+)
+
+data class FormularioNotaErrores(
+    val titulo: String? = null,
+    val calificacion: String? = null,
+    val retroalimentacion: String? = null
+)

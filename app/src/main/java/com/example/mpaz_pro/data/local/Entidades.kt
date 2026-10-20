@@ -39,3 +39,17 @@ data class InformeEntity(
     val observacionDocente: String,
     val fecha: String
 )
+
+@Entity(tableName = "notas")
+data class NotaEntity(
+    @PrimaryKey val id: String,
+    val idEstudiante: String,
+    val nombreEstudiante: String,
+    val curso: String = "2° Básico A",
+    val idAsignatura: String,
+    val nombreAsignatura: String,
+    val tituloEvaluacion: String,
+    val calificacion: Double,
+    val retroalimentacion: String,
+    val fecha: String
+)

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -49,7 +50,6 @@ fun AppDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -112,6 +112,17 @@ fun AppDrawer(
                     selected = pantallaActual == "Módulos de Aprendizaje",
                     onClick = {
                         onPantallaSeleccionada("Módulos de Aprendizaje")
+                        scope.launch { drawerState.close() }
+                    },
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.Star, contentDescription = null) },
+                    label = { Text("Libro de Calificaciones") },
+                    selected = pantallaActual == "Libro de Calificaciones",
+                    onClick = {
+                        onPantallaSeleccionada("Libro de Calificaciones")
                         scope.launch { drawerState.close() }
                     },
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)

@@ -2,6 +2,7 @@ package com.example.mpaz_pro.data.repository
 
 import com.example.mpaz_pro.data.local.AppDao
 import com.example.mpaz_pro.data.local.InformeEntity
+import com.example.mpaz_pro.data.local.NotaEntity
 import com.example.mpaz_pro.data.local.ObjetivoEntity
 import com.example.mpaz_pro.data.local.UsuarioEntity
 import kotlinx.coroutines.flow.Flow
@@ -42,5 +43,21 @@ class RepositorioApp(private val dao: AppDao) {
 
     suspend fun actualizarObservacionInforme(id: String, observacion: String) {
         dao.actualizarObservacionInforme(id, observacion)
+    }
+
+    fun obtenerTodasLasNotas(): Flow<List<NotaEntity>> {
+        return dao.obtenerTodasLasNotas()
+    }
+
+    fun obtenerNotasPorEstudiante(idEstudiante: String): Flow<List<NotaEntity>> {
+        return dao.obtenerNotasPorEstudiante(idEstudiante)
+    }
+
+    suspend fun guardarNota(nota: NotaEntity) {
+        dao.guardarNota(nota)
+    }
+
+    suspend fun eliminarNota(id: String) {
+        dao.eliminarNota(id)
     }
 }
