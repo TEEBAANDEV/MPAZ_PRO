@@ -8,7 +8,8 @@ data class UsuarioEntity(
     @PrimaryKey val nombreUsuario: String,
     val clave: String,
     val nombreCompleto: String,
-    val rol: String
+    val rol: String,
+    val fotoPerfilUri: String? = null
 )
 
 @Entity(tableName = "objetivos")

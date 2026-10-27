@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.example.mpaz_pro.data.local.UsuarioEntity
 import com.example.mpaz_pro.ui.components.AppBottomBar
 import com.example.mpaz_pro.ui.components.AppDrawer
+import com.example.mpaz_pro.ui.components.AvatarConLapizPerfil
 import com.example.mpaz_pro.ui.components.BarraSuperiorMpaz
 import com.example.mpaz_pro.ui.components.ElementoNavegacionInferior
 import com.example.mpaz_pro.viewmodel.MpazViewModel
@@ -35,6 +36,7 @@ import com.example.mpaz_pro.viewmodel.MpazViewModel
 fun PantallaEstudiante(
     usuarioActual: UsuarioEntity?,
     viewModel: MpazViewModel,
+    onActualizarFoto: ((String?) -> Unit)? = null,
     alCerrarSesion: () -> Unit
 ) {
     val objetivos by viewModel.objetivosAsignados.collectAsState()
@@ -76,6 +78,7 @@ fun PantallaEstudiante(
         },
         nombreUsuario = nombreAlumno,
         rolUsuario = "Estudiante 2° Básico",
+        fotoPerfilUri = usuarioActual?.fotoPerfilUri,
         onPantallaSeleccionada = { seccion ->
             when (seccion) {
                 "Panel Principal", "Módulos de Aprendizaje" -> seccionActual = "Misiones"
@@ -422,20 +425,14 @@ fun PantallaEstudiante(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.School,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(48.dp)
-                            )
-                        }
+                        AvatarConLapizPerfil(
+                            fotoUri = usuarioActual?.fotoPerfilUri,
+                            onFotoCambiada = { uri ->
+                                onActualizarFoto?.invoke(uri?.toString())
+                            },
+                            tamano = 96.dp,
+                            iconoPorDefecto = Icons.Default.School
+                        )
 
                         Text(
                             text = nombreAlumno,

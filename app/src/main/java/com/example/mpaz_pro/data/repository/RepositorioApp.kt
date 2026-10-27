@@ -13,6 +13,14 @@ class RepositorioApp(private val dao: AppDao) {
         return dao.iniciarSesion(usuario, clave)
     }
 
+    fun obtenerUsuarioPorNombre(nombreUsuario: String): Flow<UsuarioEntity?> {
+        return dao.obtenerUsuarioPorNombre(nombreUsuario)
+    }
+
+    suspend fun actualizarFotoPerfil(nombreUsuario: String, uri: String?) {
+        dao.actualizarFotoPerfil(nombreUsuario, uri)
+    }
+
     fun obtenerTodosLosObjetivos(): Flow<List<ObjetivoEntity>> {
         return dao.obtenerTodosLosObjetivos()
     }

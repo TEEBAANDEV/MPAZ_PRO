@@ -15,6 +15,7 @@ materialIconsExtended = "1.7.6"
 room = "2.8.5"
 ksp = "2.2.10-2.0.2"
 gson = "2.10.1"
+coil = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,6 +43,9 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 
 # Gson
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+# Coil
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

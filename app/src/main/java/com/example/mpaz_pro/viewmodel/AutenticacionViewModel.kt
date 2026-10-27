@@ -89,4 +89,12 @@ class AutenticacionViewModel(private val repositorio: RepositorioApp) : ViewMode
         _errores.value = FormularioLoginErrores()
         _estadoUi.value = EstadoAutenticacion()
     }
+
+    fun actualizarFotoPerfil(uri: String?) {
+        val usuario = _estadoUi.value.usuarioActual ?: return
+        viewModelScope.launch {
+            repositorio.actualizarFotoPerfil(usuario.nombreUsuario, uri)
+            _estadoUi.update { it.copy(usuarioActual = usuario.copy(fotoPerfilUri = uri)) }
+        }
+    }
 }

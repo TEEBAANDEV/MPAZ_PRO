@@ -39,6 +39,7 @@ fun AppDrawer(
     pantallaActual: String,
     nombreUsuario: String = "Usuario",
     rolUsuario: String = "2.º Básico",
+    fotoPerfilUri: String? = null,
     onPantallaSeleccionada: (String) -> Unit,
     onCerrarSesion: () -> Unit = {},
     contenido: @Composable (abrirMenu: () -> Unit) -> Unit
@@ -57,20 +58,12 @@ fun AppDrawer(
                         .padding(20.dp)
                 ) {
                     Column {
-                        Box(
-                            modifier = Modifier
-                                .size(64.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.School,
-                                contentDescription = "Logo Escuela",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
+                        ImagenInteligente(
+                            imagenUri = fotoPerfilUri,
+                            tamano = 64.dp,
+                            iconoPorDefecto = Icons.Default.School,
+                            tamanoIcono = 36.dp
+                        )
 
                         Spacer(modifier = Modifier.height(12.dp))
 

@@ -50,6 +50,8 @@ fun GrafoNavegacion(
         composable(DestinoNavegacion.Utp.ruta) {
             PantallaUtp(
                 viewModel = mpazViewModel,
+                usuarioActual = estadoAuth.usuarioActual,
+                onActualizarFoto = { uri -> autenticacionViewModel.actualizarFotoPerfil(uri) },
                 alCerrarSesion = {
                     autenticacionViewModel.cerrarSesion()
                     controladorNavegacion.navigate(DestinoNavegacion.InicioSesion.ruta) {
@@ -62,6 +64,8 @@ fun GrafoNavegacion(
         composable(DestinoNavegacion.Docente.ruta) {
             PantallaDocente(
                 viewModel = mpazViewModel,
+                usuarioActual = estadoAuth.usuarioActual,
+                onActualizarFoto = { uri -> autenticacionViewModel.actualizarFotoPerfil(uri) },
                 alCerrarSesion = {
                     autenticacionViewModel.cerrarSesion()
                     controladorNavegacion.navigate(DestinoNavegacion.InicioSesion.ruta) {
@@ -75,6 +79,7 @@ fun GrafoNavegacion(
             PantallaEstudiante(
                 usuarioActual = estadoAuth.usuarioActual,
                 viewModel = mpazViewModel,
+                onActualizarFoto = { uri -> autenticacionViewModel.actualizarFotoPerfil(uri) },
                 alCerrarSesion = {
                     autenticacionViewModel.cerrarSesion()
                     controladorNavegacion.navigate(DestinoNavegacion.InicioSesion.ruta) {

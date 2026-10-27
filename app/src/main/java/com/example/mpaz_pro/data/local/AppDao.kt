@@ -12,6 +12,12 @@ interface AppDao {
     @Query("SELECT * FROM usuarios WHERE nombreUsuario = :usuario AND clave = :clave LIMIT 1")
     suspend fun iniciarSesion(usuario: String, clave: String): UsuarioEntity?
 
+    @Query("SELECT * FROM usuarios WHERE nombreUsuario = :nombreUsuario LIMIT 1")
+    fun obtenerUsuarioPorNombre(nombreUsuario: String): Flow<UsuarioEntity?>
+
+    @Query("UPDATE usuarios SET fotoPerfilUri = :uri WHERE nombreUsuario = :nombreUsuario")
+    suspend fun actualizarFotoPerfil(nombreUsuario: String, uri: String?)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertarUsuarios(usuarios: List<UsuarioEntity>)
 
