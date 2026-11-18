@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    private const val BASE_URL_MICROSERVICIO = "http://100.55.19.106:8080/"
+    private const val BASE_URL_MICROSERVICIO = "http://34.193.30.37:8080/"
     private const val BASE_URL_API_EXTERNA = "https://dummyjson.com/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
