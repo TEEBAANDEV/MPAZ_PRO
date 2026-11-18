@@ -5,12 +5,79 @@ import com.example.mpaz_pro.data.local.InformeEntity
 import com.example.mpaz_pro.data.local.NotaEntity
 import com.example.mpaz_pro.data.local.ObjetivoEntity
 import com.example.mpaz_pro.data.local.UsuarioEntity
+import com.example.mpaz_pro.data.remote.ExternalApiService
+import com.example.mpaz_pro.data.remote.FraseExternaDto
+import com.example.mpaz_pro.data.remote.LoginRequest
+import com.example.mpaz_pro.data.remote.MpazApiService
+import com.example.mpaz_pro.data.remote.ObjetivoRemotoDto
+import com.example.mpaz_pro.data.remote.RetrofitClient
+import com.example.mpaz_pro.data.remote.TokenManager
 import kotlinx.coroutines.flow.Flow
 
-class RepositorioApp(private val dao: AppDao) {
+class RepositorioApp(
+    private val dao: AppDao,
+    private val mpazApi: MpazApiService = RetrofitClient.mpazApi,
+    private val externalApi: ExternalApiService = RetrofitClient.externalApi
+) {
 
     suspend fun iniciarSesion(usuario: String, clave: String): UsuarioEntity? {
+        try {
+            val respuesta = mpazApi.login(LoginRequest(usuario, clave))
+            if (respuesta.isSuccessful) {
+                val body = respuesta.body()
+                if (body != null) {
+                    TokenManager.guardarToken(body.token)
+                    return dao.iniciarSesion(usuario, clave) ?: UsuarioEntity(
+                        nombreUsuario = body.username,
+                        clave = clave,
+                        nombreCompleto = body.nombreCompleto,
+                        rol = body.rol
+                    )
+                }
+            }
+        } catch (_: Exception) {
+            // Fallback a Room local si el microservicio no está levantado
+        }
         return dao.iniciarSesion(usuario, clave)
+    }
+
+    suspend fun obtenerFraseMotivacionalExterna(): Result<FraseExternaDto> {
+        return try {
+            val response = externalApi.obtenerFraseMotivacional()
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun obtenerObjetivosRemotos(): Result<List<ObjetivoRemotoDto>> {
+        return try {
+            val response = mpazApi.obtenerObjetivos()
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun crearObjetivoRemoto(objetivo: ObjetivoRemotoDto): Result<ObjetivoRemotoDto> {
+        return try {
+            val response = mpazApi.crearObjetivo(objetivo)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     fun obtenerUsuarioPorNombre(nombreUsuario: String): Flow<UsuarioEntity?> {

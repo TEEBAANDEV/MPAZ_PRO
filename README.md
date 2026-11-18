@@ -131,3 +131,41 @@ Para ingresar en la versión formal (`main`), ingrese las credenciales registrad
   * Distribución equitativa de tarjetas entre ambos integrantes de la pareja.
 * **Flujo Git:**
   * Commits atómicos y descriptivos siguiendo la convención técnica: `feat:`, `fix:`, `refactor:`, `docs:`.
+
+
+---
+
+## 🚀 8. Actualización Evaluación Parcial 4 (Microservicios, JWT, API Externa, Tests y APK Firmado)
+
+### 🧩 Microservicios Propios (Spring Boot + H2 + JWT)
+Ubicación: [`backend/`](backend/)
+- `POST /api/auth/login` — Autenticación de usuarios y generación de token **JWT**.
+- `POST /api/auth/register` — Registro de nuevos usuarios.
+- `GET /api/objetivos` — Lista todos los Objetivos de Aprendizaje.
+- `POST /api/objetivos` — Crea un nuevo Objetivo de Aprendizaje.
+- `PUT /api/objetivos/{id}` — Actualiza un Objetivo existente.
+- `DELETE /api/objetivos/{id}` — Elimina un Objetivo.
+- `GET /api/asignaciones` | `POST /api/asignaciones` — Gestión de asignaciones docentes.
+- `GET /api/observaciones` | `POST /api/observaciones` — Gestión de observaciones pedagógicas.
+
+### 🌍 API Externa Consumida (Retrofit)
+- **Endpoint:** `https://dummyjson.com/quotes/random`
+- **Uso en la app:** Muestra una frase motivacional aleatoria en la vista del estudiante sin interferir con los datos locales ni con los microservicios propios.
+
+### ⚙️ Pasos para Ejecutar
+1. **Levantar el backend Spring Boot:**
+   ```powershell
+   .\gradlew.bat -p backend bootRun
+   ```
+   El servidor quedará disponible en `http://localhost:8080` (desde el emulador Android: `http://10.0.2.2:8080/`).
+   Consola H2 disponible en `http://localhost:8080/h2-console`.
+2. **Ejecutar pruebas unitarias:**
+   ```powershell
+   .\gradlew.bat testDebugUnitTest
+   ```
+3. **Generar APK firmado (Release):**
+   ```powershell
+   .\gradlew.bat assembleRelease
+   ```
+   - Llave generada: `app/mpaz_release.jks` (alias `mpaz_key`)
+   - APK generado: `app/build/outputs/apk/release/app-release.apk`

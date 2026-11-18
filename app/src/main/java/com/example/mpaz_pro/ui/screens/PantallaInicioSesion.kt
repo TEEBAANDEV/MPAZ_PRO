@@ -121,8 +121,19 @@ fun PantallaInicioSesion(
                         )
                     }
 
+                    val contexto = androidx.compose.ui.platform.LocalContext.current
                     Button(
-                        onClick = { viewModel.iniciarSesion(alIniciarSesionConExito) },
+                        onClick = {
+                            viewModel.iniciarSesion { rol ->
+                                val aviso = if (com.example.mpaz_pro.data.remote.TokenManager.jwtToken != null) {
+                                    "Conectado al microservicio AWS (JWT activo)"
+                                } else {
+                                    "Sin respuesta del servidor AWS: operando en modo local"
+                                }
+                                android.widget.Toast.makeText(contexto, aviso, android.widget.Toast.LENGTH_LONG).show()
+                                alIniciarSesionConExito(rol)
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth().height(48.dp),
                         shape = RoundedCornerShape(10.dp)
                     ) {

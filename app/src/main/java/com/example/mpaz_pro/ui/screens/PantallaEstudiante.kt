@@ -42,6 +42,11 @@ fun PantallaEstudiante(
     val objetivos by viewModel.objetivosAsignados.collectAsState()
     val notas by viewModel.todasLasNotas.collectAsState()
     val estaHablando by viewModel.estaHablando.collectAsState()
+    val fraseExterna by viewModel.fraseExterna.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.cargarFraseExterna()
+    }
     val nombreAlumno = usuarioActual?.nombreCompleto ?: "Lucas González"
     val idAlumno = usuarioActual?.nombreUsuario ?: "lucas"
 

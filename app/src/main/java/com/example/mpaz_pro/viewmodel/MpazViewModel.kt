@@ -39,6 +39,17 @@ class MpazViewModel(
 
     val estaHablando: StateFlow<Boolean> = ayudanteTextoAVoz.estaHablando
 
+    private val _fraseExterna = MutableStateFlow<com.example.mpaz_pro.data.remote.FraseExternaDto?>(null)
+    val fraseExterna: StateFlow<com.example.mpaz_pro.data.remote.FraseExternaDto?> = _fraseExterna.asStateFlow()
+
+    fun cargarFraseExterna() {
+        viewModelScope.launch {
+            repositorio.obtenerFraseMotivacionalExterna().onSuccess { frase ->
+                _fraseExterna.value = frase
+            }
+        }
+    }
+
     fun reproducirAudio(texto: String) {
         ayudanteTextoAVoz.hablar(texto)
     }
