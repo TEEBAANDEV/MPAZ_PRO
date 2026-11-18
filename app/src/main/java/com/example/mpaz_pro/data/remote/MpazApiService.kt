@@ -38,6 +38,16 @@ data class ObservacionRemotaDto(
     val fecha: String
 )
 
+data class NotaRemotaDto(
+    val id: Long? = null,
+    val estudiante: String,
+    val asignatura: String,
+    val tituloEvaluacion: String,
+    val calificacion: Double,
+    val retroalimentacion: String,
+    val fecha: String
+)
+
 interface MpazApiService {
 
     @POST("api/auth/login")
@@ -69,4 +79,10 @@ interface MpazApiService {
 
     @POST("api/observaciones")
     suspend fun crearObservacion(@Body observacion: ObservacionRemotaDto): Response<ObservacionRemotaDto>
+
+    @GET("api/notas")
+    suspend fun obtenerNotas(): Response<List<NotaRemotaDto>>
+
+    @POST("api/notas")
+    suspend fun crearNota(@Body nota: NotaRemotaDto): Response<NotaRemotaDto>
 }

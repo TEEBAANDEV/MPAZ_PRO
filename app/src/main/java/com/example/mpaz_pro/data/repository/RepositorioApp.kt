@@ -80,6 +80,72 @@ class RepositorioApp(
         }
     }
 
+    suspend fun crearAsignacionRemota(asignacion: com.example.mpaz_pro.data.remote.AsignacionRemotaDto): Result<com.example.mpaz_pro.data.remote.AsignacionRemotaDto> {
+        return try {
+            val response = mpazApi.crearAsignacion(asignacion)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun crearObservacionRemota(observacion: com.example.mpaz_pro.data.remote.ObservacionRemotaDto): Result<com.example.mpaz_pro.data.remote.ObservacionRemotaDto> {
+        return try {
+            val response = mpazApi.crearObservacion(observacion)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun sincronizarObjetivosDesdeBackend() {
+        try {
+            val response = mpazApi.obtenerObjetivos()
+            if (response.isSuccessful) {
+                response.body()?.forEach { dto ->
+                    dao.guardarObjetivo(
+                        ObjetivoEntity(
+                            id = "remoto_${dto.id ?: dto.codigo}",
+                            idAsignatura = dto.asignatura.lowercase().replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u"),
+                            nombreAsignatura = dto.asignatura,
+                            codigo = dto.codigo,
+                            titulo = dto.titulo,
+                            descripcion = dto.descripcion,
+                            pregunta = "Actividad de ${dto.titulo}",
+                            opciones = "Opción A,Opción B,Opción C",
+                            indiceCorrecto = 0,
+                            estado = dto.estado,
+                            asignadoAlCurso = true
+                        )
+                    )
+                }
+            }
+        } catch (_: Exception) {
+            // Si el backend no responde, Room mantiene los datos locales
+        }
+    }
+
+    suspend fun crearNotaRemota(nota: com.example.mpaz_pro.data.remote.NotaRemotaDto): Result<com.example.mpaz_pro.data.remote.NotaRemotaDto> {
+        return try {
+            val response = mpazApi.crearNota(nota)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     fun obtenerUsuarioPorNombre(nombreUsuario: String): Flow<UsuarioEntity?> {
         return dao.obtenerUsuarioPorNombre(nombreUsuario)
     }

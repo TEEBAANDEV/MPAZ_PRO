@@ -18,6 +18,9 @@ public class Usuario {
     private String nombreCompleto;
     private String rol;
 
+    @Lob
+    private String fotoPerfil;
+
     public Usuario() {}
 
     public Usuario(Long id, String username, String password, String nombreCompleto, String rol) {
@@ -38,4 +41,6 @@ public class Usuario {
     public void setNombreCompleto(String nombreCompleto) { this.nombreCompleto = nombreCompleto; }
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
+    public String getFotoPerfil() { return fotoPerfil; }
+    public void setFotoPerfil(String fotoPerfil) { this.fotoPerfil = fotoPerfil; }
 }

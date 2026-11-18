@@ -39,6 +39,12 @@ class MpazViewModel(
 
     val estaHablando: StateFlow<Boolean> = ayudanteTextoAVoz.estaHablando
 
+    init {
+        viewModelScope.launch {
+            repositorio.sincronizarObjetivosDesdeBackend()
+        }
+    }
+
     private val _fraseExterna = MutableStateFlow<com.example.mpaz_pro.data.remote.FraseExternaDto?>(null)
     val fraseExterna: StateFlow<com.example.mpaz_pro.data.remote.FraseExternaDto?> = _fraseExterna.asStateFlow()
 
@@ -109,6 +115,13 @@ class MpazViewModel(
         return errores == FormularioObjetivoErrores()
     }
 
+    fun actualizarAsignaturaObjetivo(idAsignatura: String, nombreAsignatura: String) {
+        _formularioObjetivo.value = _formularioObjetivo.value.copy(
+            idAsignatura = idAsignatura,
+            nombreAsignatura = nombreAsignatura
+        )
+    }
+
     fun guardarObjetivo(alTerminar: () -> Unit) {
         if (!validarFormularioObjetivo()) return
 
@@ -128,6 +141,15 @@ class MpazViewModel(
                 asignadoAlCurso = true
             )
             repositorio.guardarObjetivo(nuevo)
+            repositorio.crearObjetivoRemoto(
+                com.example.mpaz_pro.data.remote.ObjetivoRemotoDto(
+                    codigo = nuevo.codigo,
+                    titulo = nuevo.titulo,
+                    descripcion = nuevo.descripcion,
+                    asignatura = nuevo.nombreAsignatura,
+                    estado = nuevo.estado
+                )
+            )
             alTerminar()
         }
     }
@@ -147,6 +169,17 @@ class MpazViewModel(
     fun alternarAsignacionObjetivo(id: String, asignado: Boolean) {
         viewModelScope.launch {
             repositorio.actualizarAsignacionObjetivo(id, asignado)
+            if (asignado) {
+                repositorio.crearAsignacionRemota(
+                    com.example.mpaz_pro.data.remote.AsignacionRemotaDto(
+                        objetivoId = id.toLongOrNull() ?: 1L,
+                        curso = "2° Básico",
+                        limiteIntentos = 3,
+                        fechaInicio = "2026-11-18",
+                        fechaFin = "2026-12-18"
+                    )
+                )
+            }
         }
     }
 
@@ -168,6 +201,14 @@ class MpazViewModel(
 
         viewModelScope.launch {
             repositorio.actualizarObservacionInforme(form.idInforme, form.observacion.trim())
+            repositorio.crearObservacionRemota(
+                com.example.mpaz_pro.data.remote.ObservacionRemotaDto(
+                    estudiante = form.idInforme,
+                    docente = "Docente 2° Básico",
+                    comentario = form.observacion.trim(),
+                    fecha = "2026-11-18"
+                )
+            )
             alTerminar()
         }
     }

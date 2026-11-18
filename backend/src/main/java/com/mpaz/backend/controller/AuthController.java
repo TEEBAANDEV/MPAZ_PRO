@@ -56,4 +56,17 @@ public class AuthController {
                 "rol", saved.getRol()
         ));
     }
+
+    @PutMapping("/foto")
+    public ResponseEntity<?> actualizarFoto(@RequestBody Map<String, String> body) {
+        String username = body.get("username");
+        String fotoPerfil = body.get("fotoPerfil");
+        return usuarioRepository.findByUsername(username)
+                .<ResponseEntity<?>>map(u -> {
+                    u.setFotoPerfil(fotoPerfil);
+                    usuarioRepository.save(u);
+                    return ResponseEntity.ok(Map.of("mensaje", "Foto actualizada"));
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

@@ -2,7 +2,9 @@ package com.example.mpaz_pro.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -561,6 +563,19 @@ fun PantallaUtp(
             title = { Text("Nuevo Objetivo de Aprendizaje") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Asignatura:", style = MaterialTheme.typography.labelMedium)
+                    Row(
+                        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        asignaturas.filter { it.first != "todas" }.forEach { (idAsig, nombreAsig) ->
+                            FilterChip(
+                                selected = form.idAsignatura == idAsig,
+                                onClick = { viewModel.actualizarAsignaturaObjetivo(idAsig, nombreAsig) },
+                                label = { Text(nombreAsig) }
+                            )
+                        }
+                    }
                     OutlinedTextField(
                         value = form.codigo,
                         onValueChange = { viewModel.actualizarCodigoObjetivo(it) },

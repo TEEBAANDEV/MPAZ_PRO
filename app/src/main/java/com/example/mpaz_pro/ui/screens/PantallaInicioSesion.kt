@@ -126,9 +126,9 @@ fun PantallaInicioSesion(
                         onClick = {
                             viewModel.iniciarSesion { rol ->
                                 val aviso = if (com.example.mpaz_pro.data.remote.TokenManager.jwtToken != null) {
-                                    "Conectado al microservicio AWS (JWT activo)"
+                                    "Inicio en el servidor exitosa!"
                                 } else {
-                                    "Sin respuesta del servidor AWS: operando en modo local"
+                                    "Sin respuesta del servidor, conectando a respaldo local"
                                 }
                                 android.widget.Toast.makeText(contexto, aviso, android.widget.Toast.LENGTH_LONG).show()
                                 alIniciarSesionConExito(rol)
